@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { formatRagResponseForChat } from "../utils"; // Correct import
 import { exportChatHistory } from "../utils/logger"; // Import logger utilities
 
 export default function ChatInterface({ serverUrl, mode, messages, setMessages, sessionId, onSessionUpdate }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
   // Ensure messages is always an array
   const safeMessages = messages || [];
 
-
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [safeMessages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -335,6 +339,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input box fixed at bottom */}
