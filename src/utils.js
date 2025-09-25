@@ -23,6 +23,24 @@ export function formatRagResponseForChat(data) {
     answer = answerData.Intermediate_message.trim();
   }
 
+  // Clean up answer: remove markdown headers and unwanted formatting
+  if (answer) {
+    // Remove ### headers and similar markdown formatting
+    answer = answer.replace(/^#{1,6}\s+/gm, '');
+    // Remove any remaining markdown-style headers
+    answer = answer.replace(/^[-=]{3,}$/gm, '');
+    
+    // Handle FoA and similar patterns intelligently
+    // Remove lines that contain ** patterns (broken formatting)
+    answer = answer.replace(/^.*\*\*.*\*\*.*$/gm, '');
+    
+    // Bold headings that end with ": -" pattern
+    answer = answer.replace(/^([^:\n]+:\s*-)\s*$/gm, '**$1**');
+    
+    // Clean up extra whitespace
+    answer = answer.replace(/\n{3,}/g, '\n\n').trim();
+  }
+
   // --- Related Questions ---
   if (answer) {
     const relatedMatch = answer.match(/Related Questions?:?\s*((?:\d+\.\s*[^\n]+\n*)+)/i);

@@ -45,12 +45,8 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   const data = await res.json();
   const { answer, related, citations } = formatRagResponseForChat(data);
 
-  // Build display string
+  // Build display string - only show answer and citations
   let formattedText = answer;
-
-  if (related.length > 0) {
-    formattedText += `\n\n**Related Questions:**\n${related.join("\n")}`;
-  }
 
   // Only add citations section if we have valid citations with content
   if (citations.length > 0 && citations.some(c => c.file)) {
@@ -302,20 +298,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                 ) : (
                   // Normal handling for RAG responses
                   msg.text.split('\n\n').map((block, blockIdx) => {
-                    if (block.startsWith('**Related Questions:**')) {
-                      return (
-                        <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
-                          <div className="whitespace-pre-wrap font-semibold mb-2 text-gray-300">Related Questions:</div>
-                          <div className="space-y-1 pl-2">
-                            {block.replace('**Related Questions:**', '').trim().split('\n').map((question, qIdx) => (
-                              <div key={qIdx} className="text-gray-200">
-                                {question}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    } else if (block.startsWith('**Citations:**')) {
+                    if (block.startsWith('**Citations:**')) {
                       return (
                         <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
                           <div className="whitespace-pre-wrap font-semibold mb-2 text-gray-300">Citations:</div>
