@@ -38,7 +38,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 </div>
                 <div className="hidden md:block">
                   <h1 className="text-lg font-bold bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent">
-                    Research Agent
+                    Secondary Research Agent
                   </h1>
                 </div>
               </div>
