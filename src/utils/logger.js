@@ -192,11 +192,9 @@ export function logResponse(payload, data, mode = 'rag') {
 
   const mdContent = [
     '# API Response Report',
-    '='.repeat(50),
     `**Generated:** ${displayTimestamp}`,
     `**Mode:** ${mode.toUpperCase()}`,
     `**Query:** ${payload.query || 'N/A'}`,
-    '='.repeat(50),
     '',
     content
   ].join('\n');
@@ -216,11 +214,9 @@ export function exportChatHistory(messages, mode = 'rag') {
   
   const lines = [
     '# Chat History Export',
-    '='.repeat(50),
     `**Generated:** ${displayTimestamp}`,
     `**Mode:** ${mode.toUpperCase()}`,
     `**Total Messages:** ${messages.length}`,
-    '='.repeat(50),
     ''
   ];
 
