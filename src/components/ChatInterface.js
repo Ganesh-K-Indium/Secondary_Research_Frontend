@@ -96,13 +96,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             decoded += decoder.decode(value, { stream: true });
 
             // Update the last bot message with streaming content
-            setMessages((prev) => {
-              const copy = [...prev];
-              if (copy.length > 0 && copy[copy.length - 1].sender === "bot") {
-                copy[copy.length - 1] = { sender: "bot", text: decoded, partial: true, timestamp: Date.now() };
-              }
-              return copy;
-            });
+            setMessages([...updatedMessages, { sender: "bot", text: decoded, partial: true, timestamp: Date.now() }]);
           }
 
           // finalize the response
