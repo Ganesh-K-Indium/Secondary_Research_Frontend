@@ -1,15 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { formatRagResponseForChat } from "../utils"; // Correct import
+import { exportChatHistory } from "../utils/logger"; // Import logger utilities
 
-export default function ChatInterface({ serverUrl, mode, messages, setMessages }) {
+export default function ChatInterface({ serverUrl, mode, messages, setMessages, sessionId, onSessionUpdate }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Ensure messages is always an array
+  const safeMessages = messages || [];
+
+  // Debug effect to track messages changes
+  useEffect(() => {
+    console.log(`[${mode.toUpperCase()}] Messages changed - Count: ${safeMessages.length}, Session: ${sessionId}`);
+  }, [messages, mode, sessionId, safeMessages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    console.log(`[${mode.toUpperCase()}] Sending message:`, input);
+    console.log(`[${mode.toUpperCase()}] Current messages count:`, safeMessages.length);
+    console.log(`[${mode.toUpperCase()}] Server URL:`, serverUrl);
+
+    const userMessage = { 
+      sender: "user", 
+      text: input,
+      timestamp: Date.now()
+    };
+    const updatedMessages = [...safeMessages, userMessage];
+    console.log(`[${mode.toUpperCase()}] Updated messages count:`, updatedMessages.length);
+    
+    // Update parent state immediately
+    setMessages(updatedMessages);
+    
+    // Update session with new user message
+    if (sessionId && onSessionUpdate) {
+      console.log(`[${mode.toUpperCase()}] Updating session with user message`);
+      onSessionUpdate(sessionId, updatedMessages, mode);
+    }
+    
     setInput("");
     setLoading(true);
 
@@ -45,79 +73,234 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages }
     });
   }
 
-  const botMessage = { sender: "bot", text: formattedText };
-  setMessages((prev) => [...prev, botMessage]);
+  const botMessage = { 
+    sender: "bot", 
+    text: formattedText,
+    timestamp: Date.now()
+  };
+  const finalMessages = [...updatedMessages, botMessage];
+  setMessages(finalMessages);
+  
+  // Update session with bot response
+  if (sessionId && onSessionUpdate) {
+    onSessionUpdate(sessionId, finalMessages, mode);
+  }
 } else {
-        const res = await fetch(`${serverUrl}?query=${encodeURIComponent(input)}`);
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let decoded = "";
+        console.log('Starting ingestion request to:', serverUrl);
+        console.log('Current messages before ingestion:', updatedMessages);
+        
+          // TEST: Add a simple bot response first to verify UI works
+        if (input.toLowerCase().includes('test')) {
+          console.log('TEST MODE: Adding simple bot response');
+          const testBotMessage = { 
+            sender: "bot", 
+            text: "This is a test response to verify the ingestion UI is working correctly.", 
+            timestamp: Date.now() 
+          };
+          const testMessages = [...updatedMessages, testBotMessage];
+          
+          setMessages(testMessages);
+          
+          if (sessionId && onSessionUpdate) {
+            onSessionUpdate(sessionId, testMessages, mode);
+          }
+          setLoading(false);
+          return;
+        }        try {
+          const res = await fetch(`${serverUrl}?query=${encodeURIComponent(input)}`);
+          
+          if (!res.ok) {
+            throw new Error(`Ingestion server error: ${res.status}`);
+          }
+          
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let decoded = "";
+          
+          // Add initial bot message for streaming
+          const initialBotMessage = { sender: "bot", text: "Processing...", partial: true, timestamp: Date.now() };
+          const messagesWithBot = [...updatedMessages, initialBotMessage];
+          console.log('Setting initial messages with bot placeholder:', messagesWithBot.length);
+          
+          setMessages(messagesWithBot);
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          console.log('Starting to read ingestion stream...');
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-          decoded += decoder.decode(value, { stream: true });
-          const current = decoded; // safe closure
+            decoded += decoder.decode(value, { stream: true });
+            console.log('Streaming chunk received, current decoded length:', decoded.length);
 
-          setMessages((prev) => {
-            const copy = [...prev];
-            const last = copy[copy.length - 1];
-            if (last && last.sender === "bot" && last.partial) {
-              copy[copy.length - 1] = { sender: "bot", text: current, partial: true };
+            // Update the last bot message with streaming content
+            setMessages((prev) => {
+              console.log('Updating streaming message, prev length:', prev.length);
+              const copy = [...prev];
+              if (copy.length > 0 && copy[copy.length - 1].sender === "bot") {
+                copy[copy.length - 1] = { sender: "bot", text: decoded, partial: true, timestamp: Date.now() };
+                console.log('Updated bot message with text length:', decoded.length);
+              }
               return copy;
-            } else {
-              return [...copy, { sender: "bot", text: current, partial: true }];
-            }
-          });
+            });
+          }
+
+          // finalize the response
+          console.log('Finalizing ingestion stream with decoded text:', decoded);
+          const finalMessages = [...updatedMessages, { sender: "bot", text: decoded, timestamp: Date.now() }];
+          
+          setMessages(finalMessages);
+          
+          // Update session with final response
+          if (sessionId && onSessionUpdate) {
+            console.log('Updating session with final ingestion response, total messages:', finalMessages.length);
+            onSessionUpdate(sessionId, finalMessages, mode);
+          }
+        } catch (streamError) {
+          console.error('Streaming error:', streamError);
+          
+          // Fallback: Add a simple bot response to test UI
+          console.log('Adding fallback bot response for testing');
+          const fallbackMessages = [...updatedMessages, { 
+            sender: "bot", 
+            text: `Error connecting to ingestion server: ${streamError.message}. (This is a test response to verify UI is working)`, 
+            timestamp: Date.now() 
+          }];
+          
+          setMessages(fallbackMessages);
+          
+          if (sessionId && onSessionUpdate) {
+            onSessionUpdate(sessionId, fallbackMessages, mode);
+          }
+          
+          throw streamError;
         }
 
-        // finalize
-        setMessages((prev) => {
-          const copy = [...prev];
-          const last = copy[copy.length - 1];
-          if (last && last.sender === "bot") {
-            copy[copy.length - 1] = { sender: "bot", text: decoded };
-          }
-          return copy;
-        });
+
       }
     } catch (err) {
       console.error("Error:", err);
-      setMessages((prev) => [...prev, { sender: "bot", text: "Error connecting to server." }]);
+      const errorMessage = { 
+        sender: "bot", 
+        text: `Error connecting to server: ${err.message}`,
+        timestamp: Date.now()
+      };
+      const errorMessages = [...updatedMessages, errorMessage];
+      setMessages(errorMessages);
+      
+      // Update session with error message
+      if (sessionId && onSessionUpdate) {
+        onSessionUpdate(sessionId, errorMessages, mode);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const clearChat = () => {
+  const clearChat = (event) => {
+    // Prevent any default browser behavior or event bubbling
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    console.log(`[${mode.toUpperCase()}] Clearing chat for session:`, sessionId);
+    console.log(`[${mode.toUpperCase()}] Current messages before clear:`, safeMessages.length);
+    console.log(`[${mode.toUpperCase()}] Current session exists:`, !!sessionId);
+    
+    // Clear messages immediately
     setMessages([]);
+    
+    // Update session with empty messages for this mode only
+    if (sessionId && onSessionUpdate) {
+      console.log(`[${mode.toUpperCase()}] Updating session with empty messages`);
+      try {
+        onSessionUpdate(sessionId, [], mode);
+        console.log(`[${mode.toUpperCase()}] Session update completed successfully`);
+      } catch (error) {
+        console.error(`[${mode.toUpperCase()}] Error updating session:`, error);
+      }
+    }
+    
+    console.log(`[${mode.toUpperCase()}] Chat cleared successfully`);
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Header with clear button */}
-      {messages.length > 0 && (
-        <div className="p-3 flex justify-end">
-          <button
-            onClick={clearChat}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white 
-                     bg-gray-800/50 hover:bg-gray-700/50 rounded-xl 
-                     transition-all duration-200 flex items-center space-x-2
-                     border border-gray-700/50 hover:border-gray-600/50"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Clear Chat</span>
-          </button>
+    <div className="flex flex-col h-full">
+      {/* Enhanced Chatbot Header */}
+      <div className="bg-gradient-to-r from-gray-800 via-gray-750 to-gray-800 border-b border-gray-700/50 px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Left side - Bot info */}
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                {mode === 'rag' ? (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                )}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-800 animate-pulse"></div>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">
+                {mode === 'rag' ? 'Knowledge Assistant' : 'Knowledge Contributor'}
+              </h2>
+              <p className="text-xs text-gray-400">
+                {mode === 'rag' ? 'Search & Discover Information' : 'Share & Build Knowledge'}
+              </p>
+            </div>
+          </div>
+
+          {/* Right side - Actions */}
+          <div className="flex items-center space-x-2">
+            {safeMessages.length > 0 && (
+              <>
+                <button
+                  onClick={() => exportChatHistory(safeMessages, mode)}
+                  className="px-3 py-2 text-sm text-gray-400 hover:text-white 
+                           bg-gray-700/50 hover:bg-gray-600/50 rounded-lg 
+                           transition-all duration-200 flex items-center space-x-2
+                           border border-gray-600/30 hover:border-gray-500/50"
+                  title="Export chat history as Markdown"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Export</span>
+                </button>
+                <button
+                  onClick={clearChat}
+                  className="px-3 py-2 text-sm text-gray-400 hover:text-white 
+                           bg-gray-700/50 hover:bg-gray-600/50 rounded-lg 
+                           transition-all duration-200 flex items-center space-x-2
+                           border border-gray-600/30 hover:border-gray-500/50"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Clear</span>
+                </button>
+              </>
+            )}
+            <div className="flex items-center space-x-1 text-xs text-gray-500">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>Online</span>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Chat messages container with gradient background */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm">
-        {messages.length === 0 ? (
+        {safeMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-8 rounded-2xl shadow-lg 
                           border border-gray-600/30 max-w-2xl w-full backdrop-blur-sm">
@@ -152,7 +335,9 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages }
             </div>
           </div>
         ) : (
-          messages.map((msg, idx) => (
+          // Debug render
+          console.log(`[${mode.toUpperCase()}] Rendering ${safeMessages.length} messages`) ||
+          safeMessages.map((msg, idx) => (
           <div
             key={idx}
             className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
@@ -176,41 +361,49 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages }
                 )}
               </div>
               <div className="text-base leading-relaxed">
-                {msg.text.split('\n\n').map((block, blockIdx) => {
-                  if (block.startsWith('**Related Questions:**')) {
-                    return (
-                      <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
-                        <div className="font-semibold mb-2 text-gray-300">Related Questions:</div>
-                        <div className="space-y-1 pl-2">
-                          {block.replace('**Related Questions:**', '').trim().split('\n').map((question, qIdx) => (
-                            <div key={qIdx} className="text-gray-200">
-                              {question}
-                            </div>
-                          ))}
+                {mode === 'ingestion' && msg.sender === 'bot' ? (
+                  // Special handling for ingestion streaming responses
+                  <div className="whitespace-pre-wrap ">
+                    {msg.text}
+                  </div>
+                ) : (
+                  // Normal handling for RAG responses
+                  msg.text.split('\n\n').map((block, blockIdx) => {
+                    if (block.startsWith('**Related Questions:**')) {
+                      return (
+                        <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
+                          <div className="whitespace-pre-wrap font-semibold mb-2 text-gray-300">Related Questions:</div>
+                          <div className="space-y-1 pl-2">
+                            {block.replace('**Related Questions:**', '').trim().split('\n').map((question, qIdx) => (
+                              <div key={qIdx} className="text-gray-200">
+                                {question}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  } else if (block.startsWith('**Citations:**')) {
-                    return (
-                      <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
-                        <div className="font-semibold mb-2 text-gray-300">Citations:</div>
-                        <div className="space-y-2 pl-2">
-                          {block.replace('**Citations:**', '').trim().split('\n').map((citation, cIdx) => (
-                            <div key={cIdx} className="text-gray-200 text-sm">
-                              {citation}
-                            </div>
-                          ))}
+                      );
+                    } else if (block.startsWith('**Citations:**')) {
+                      return (
+                        <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
+                          <div className="whitespace-pre-wrap font-semibold mb-2 text-gray-300">Citations:</div>
+                          <div className="space-y-2 pl-2">
+                            {block.replace('**Citations:**', '').trim().split('\n').map((citation, cIdx) => (
+                              <div key={cIdx} className="text-gray-200 text-sm">
+                                {citation}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div key={blockIdx} className={blockIdx > 0 ? 'mt-3' : ''}>
-                        {block}
-                      </div>
-                    );
-                  }
-                })}
+                      );
+                    } else {
+                      return (
+                        <div key={blockIdx} className={blockIdx > 0 ? 'mt-3' : ''}>
+                          {block}
+                        </div>
+                      );
+                    }
+                  })
+                )}
               </div>
             </div>
           </div>
