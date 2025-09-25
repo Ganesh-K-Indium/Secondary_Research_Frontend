@@ -6,7 +6,7 @@ function Lander({ onStartChat }) {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500">
-            AI Chat Assistant
+            Secondary Research Agent
           </h1>
           
           <p className="text-xl text-gray-300">
