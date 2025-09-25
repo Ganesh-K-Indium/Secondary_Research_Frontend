@@ -31,11 +31,11 @@ export function formatRagResponseForChat(data) {
     answer = answer.replace(/^[-=]{3,}$/gm, '');
     
     // Handle FoA and similar patterns intelligently
-    // Remove lines that contain ** patterns (broken formatting)
-    answer = answer.replace(/^.*\*\*.*\*\*.*$/gm, '');
+    // Only remove lines with broken formatting like "Family of Apps (FoA): - **Revenue**: -"
+    answer = answer.replace(/^[^:\n]*:\s*-\s*\*\*[^:]*\*\*:\s*-\s*$/gm, '');
     
-    // Bold headings that end with ": -" pattern
-    answer = answer.replace(/^([^:\n]+:\s*-)\s*$/gm, '**$1**');
+    // Bold headings that end with ": -" pattern (but don't already have **)
+    answer = answer.replace(/^([^:\n*]+:\s*-)\s*$/gm, '**$1**');
     
     // Clean up extra whitespace
     answer = answer.replace(/\n{3,}/g, '\n\n').trim();

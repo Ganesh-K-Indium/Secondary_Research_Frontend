@@ -294,7 +294,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                     {msg.text}
                   </div>
                 ) : (
-                  // Normal handling for RAG responses
+                  // Normal handling for RAG responses with markdown-like formatting
                   msg.text.split('\n\n').map((block, blockIdx) => {
                     if (block.startsWith('**Citations:**')) {
                       return (
@@ -310,9 +310,82 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                         </div>
                       );
                     } else {
+                      // Enhanced markdown formatting for polished content
+                      const lines = block.split('\n');
+                      const formattedLines = lines.map((line, lineIdx) => {
+                        // Handle bullet points
+                        if (line.match(/^\s*[-•*]\s+/)) {
+                          const content = line.replace(/^\s*[-•*]\s+/, '');
+                          const formattedContent = content
+                            .split(/(\*\*[^*]+\*\*)/g)
+                            .map((part, partIdx) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                return (
+                                  <strong key={partIdx} className="font-semibold text-white">
+                                    {part.slice(2, -2)}
+                                  </strong>
+                                );
+                              }
+                              return part;
+                            });
+                          return (
+                            <div key={lineIdx} className="flex items-start space-x-2 mb-1">
+                              <span className="text-teal-400 mt-1 flex-shrink-0">•</span>
+                              <span>{formattedContent}</span>
+                            </div>
+                          );
+                        }
+                        
+                        // Handle numbered lists
+                        if (line.match(/^\s*\d+\.\s+/)) {
+                          const match = line.match(/^\s*(\d+)\.\s+(.+)/);
+                          if (match) {
+                            const [, number, content] = match;
+                            const formattedContent = content
+                              .split(/(\*\*[^*]+\*\*)/g)
+                              .map((part, partIdx) => {
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                  return (
+                                    <strong key={partIdx} className="font-semibold text-white">
+                                      {part.slice(2, -2)}
+                                    </strong>
+                                  );
+                                }
+                                return part;
+                              });
+                            return (
+                              <div key={lineIdx} className="flex items-start space-x-2 mb-1">
+                                <span className="text-teal-400 font-medium flex-shrink-0">{number}.</span>
+                                <span>{formattedContent}</span>
+                              </div>
+                            );
+                          }
+                        }
+                        
+                        // Handle regular text with bold formatting
+                        const formattedLine = line
+                          .split(/(\*\*[^*]+\*\*)/g)
+                          .map((part, partIdx) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return (
+                                <strong key={partIdx} className="font-semibold text-white">
+                                  {part.slice(2, -2)}
+                                </strong>
+                              );
+                            }
+                            return part;
+                          });
+                        
+                        return (
+                          <div key={lineIdx} className={line.trim() ? 'mb-1' : 'mb-2'}>
+                            {formattedLine}
+                          </div>
+                        );
+                      });
+                      
                       return (
-                        <div key={blockIdx} className={blockIdx > 0 ? 'mt-3' : ''}>
-                          {block}
+                        <div key={blockIdx} className={blockIdx > 0 ? 'mt-4' : ''}>
+                          {formattedLines}
                         </div>
                       );
                     }
