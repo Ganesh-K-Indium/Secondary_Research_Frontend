@@ -123,12 +123,12 @@ function App() {
           />
 
           <div className="flex-1 relative overflow-hidden">
-            {/* Both chats mounted; only one visible based on current session mode */}
+            {/* Simple, professional crossfade transition */}
             <div
-              className={`absolute inset-0 transform transition-all duration-500 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-300 ease-out ${
                 currentChat === "rag"
-                  ? "translate-x-0 opacity-100 z-10"
-                  : "-translate-x-full opacity-0 z-0 pointer-events-none"
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0 pointer-events-none"
               }`}
             >
               <RagChat 
@@ -140,10 +140,10 @@ function App() {
             </div>
 
             <div
-              className={`absolute inset-0 transform transition-all duration-500 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-300 ease-out ${
                 currentChat === "ingestion"
-                  ? "translate-x-0 opacity-100 z-10"
-                  : "translate-x-full opacity-0 z-0 pointer-events-none"
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0 pointer-events-none"
               }`}
             >
               <IngestionChat 
