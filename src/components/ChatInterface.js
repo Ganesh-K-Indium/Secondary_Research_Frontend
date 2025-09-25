@@ -9,17 +9,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   // Ensure messages is always an array
   const safeMessages = messages || [];
 
-  // Debug effect to track messages changes
-  useEffect(() => {
-    console.log(`[${mode.toUpperCase()}] Messages changed - Count: ${safeMessages.length}, Session: ${sessionId}`);
-  }, [messages, mode, sessionId, safeMessages]);
+
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
-    console.log(`[${mode.toUpperCase()}] Sending message:`, input);
-    console.log(`[${mode.toUpperCase()}] Current messages count:`, safeMessages.length);
-    console.log(`[${mode.toUpperCase()}] Server URL:`, serverUrl);
 
     const userMessage = { 
       sender: "user", 
@@ -27,14 +20,12 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
       timestamp: Date.now()
     };
     const updatedMessages = [...safeMessages, userMessage];
-    console.log(`[${mode.toUpperCase()}] Updated messages count:`, updatedMessages.length);
     
     // Update parent state immediately
     setMessages(updatedMessages);
     
     // Update session with new user message
     if (sessionId && onSessionUpdate) {
-      console.log(`[${mode.toUpperCase()}] Updating session with user message`);
       onSessionUpdate(sessionId, updatedMessages, mode);
     }
     
@@ -86,27 +77,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
     onSessionUpdate(sessionId, finalMessages, mode);
   }
 } else {
-        console.log('Starting ingestion request to:', serverUrl);
-        console.log('Current messages before ingestion:', updatedMessages);
-        
-          // TEST: Add a simple bot response first to verify UI works
-        if (input.toLowerCase().includes('test')) {
-          console.log('TEST MODE: Adding simple bot response');
-          const testBotMessage = { 
-            sender: "bot", 
-            text: "This is a test response to verify the ingestion UI is working correctly.", 
-            timestamp: Date.now() 
-          };
-          const testMessages = [...updatedMessages, testBotMessage];
-          
-          setMessages(testMessages);
-          
-          if (sessionId && onSessionUpdate) {
-            onSessionUpdate(sessionId, testMessages, mode);
-          }
-          setLoading(false);
-          return;
-        }        try {
+        try {
           const res = await fetch(`${serverUrl}?query=${encodeURIComponent(input)}`);
           
           if (!res.ok) {
@@ -120,65 +91,41 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
           // Add initial bot message for streaming
           const initialBotMessage = { sender: "bot", text: "Processing...", partial: true, timestamp: Date.now() };
           const messagesWithBot = [...updatedMessages, initialBotMessage];
-          console.log('Setting initial messages with bot placeholder:', messagesWithBot.length);
           
           setMessages(messagesWithBot);
-
-          console.log('Starting to read ingestion stream...');
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
             decoded += decoder.decode(value, { stream: true });
-            console.log('Streaming chunk received, current decoded length:', decoded.length);
 
             // Update the last bot message with streaming content
             setMessages((prev) => {
-              console.log('Updating streaming message, prev length:', prev.length);
               const copy = [...prev];
               if (copy.length > 0 && copy[copy.length - 1].sender === "bot") {
                 copy[copy.length - 1] = { sender: "bot", text: decoded, partial: true, timestamp: Date.now() };
-                console.log('Updated bot message with text length:', decoded.length);
               }
               return copy;
             });
           }
 
           // finalize the response
-          console.log('Finalizing ingestion stream with decoded text:', decoded);
           const finalMessages = [...updatedMessages, { sender: "bot", text: decoded, timestamp: Date.now() }];
           
           setMessages(finalMessages);
           
           // Update session with final response
           if (sessionId && onSessionUpdate) {
-            console.log('Updating session with final ingestion response, total messages:', finalMessages.length);
             onSessionUpdate(sessionId, finalMessages, mode);
           }
         } catch (streamError) {
           console.error('Streaming error:', streamError);
-          
-          // Fallback: Add a simple bot response to test UI
-          console.log('Adding fallback bot response for testing');
-          const fallbackMessages = [...updatedMessages, { 
-            sender: "bot", 
-            text: `Error connecting to ingestion server: ${streamError.message}. (This is a test response to verify UI is working)`, 
-            timestamp: Date.now() 
-          }];
-          
-          setMessages(fallbackMessages);
-          
-          if (sessionId && onSessionUpdate) {
-            onSessionUpdate(sessionId, fallbackMessages, mode);
-          }
-          
           throw streamError;
         }
 
 
       }
     } catch (err) {
-      console.error("Error:", err);
       const errorMessage = { 
         sender: "bot", 
         text: `Error connecting to server: ${err.message}`,
@@ -203,25 +150,13 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
       event.stopPropagation();
     }
     
-    console.log(`[${mode.toUpperCase()}] Clearing chat for session:`, sessionId);
-    console.log(`[${mode.toUpperCase()}] Current messages before clear:`, safeMessages.length);
-    console.log(`[${mode.toUpperCase()}] Current session exists:`, !!sessionId);
-    
     // Clear messages immediately
     setMessages([]);
     
     // Update session with empty messages for this mode only
     if (sessionId && onSessionUpdate) {
-      console.log(`[${mode.toUpperCase()}] Updating session with empty messages`);
-      try {
-        onSessionUpdate(sessionId, [], mode);
-        console.log(`[${mode.toUpperCase()}] Session update completed successfully`);
-      } catch (error) {
-        console.error(`[${mode.toUpperCase()}] Error updating session:`, error);
-      }
+      onSessionUpdate(sessionId, [], mode);
     }
-    
-    console.log(`[${mode.toUpperCase()}] Chat cleared successfully`);
   };
 
   return (
@@ -335,8 +270,6 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             </div>
           </div>
         ) : (
-          // Debug render
-          console.log(`[${mode.toUpperCase()}] Rendering ${safeMessages.length} messages`) ||
           safeMessages.map((msg, idx) => (
           <div
             key={idx}
