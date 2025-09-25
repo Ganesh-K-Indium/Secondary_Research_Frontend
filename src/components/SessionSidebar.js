@@ -53,14 +53,14 @@ export default function SessionSidebar({
     } flex flex-col`}>
       
       {/* Header */}
-      <div className="p-4 border-b border-gray-700/50">
-        <div className="flex items-center justify-between">
+      <div className={`border-b border-gray-700/50 ${isCollapsed ? 'p-2' : 'p-4'}`}>
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors"
+            className={`p-2 rounded-lg hover:bg-gray-800/50 transition-colors ${isCollapsed ? 'w-8 h-8 flex items-center justify-center' : ''}`}
           >
             <svg 
-              className={`w-5 h-5 text-gray-400 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
+              className={`${isCollapsed ? 'w-4 h-4' : 'w-5 h-5'} text-gray-400 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -183,33 +183,45 @@ export default function SessionSidebar({
         </div>
       )}
 
-      {/* Collapsed view - just the + button */}
+      {/* Collapsed view - centered buttons */}
       {isCollapsed && (
-        <div className="flex-1 flex flex-col items-center pt-4">
+        <div className="flex-1 flex flex-col items-center justify-start pt-2 px-1">
           <button
             onClick={onNewSession}
-            className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-400 hover:text-white mb-4"
+            className="w-8 h-8 mb-3 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-400 hover:text-white flex items-center justify-center"
             title="New Session"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>
           
-          {sessions.map((session) => (
-            <button
-              key={session.id}
-              onClick={() => onSessionSelect(session.id)}
-              className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
-                currentSessionId === session.id
-                  ? 'bg-gradient-to-r from-teal-600 to-blue-600 text-white'
-                  : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-white'
-              }`}
-              title={session.name}
-            >
-              {session.name.charAt(0).toUpperCase()}
-            </button>
-          ))}
+          <div className="w-full space-y-2">
+            {sessions.map((session) => (
+              <button
+                key={session.id}
+                onClick={() => onSessionSelect(session.id)}
+                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-medium transition-all relative ${
+                  currentSessionId === session.id
+                    ? 'bg-gradient-to-r from-teal-600 to-blue-600 text-white'
+                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-white'
+                }`}
+                title={session.name}
+              >
+                {session.name.charAt(0).toUpperCase()}
+                
+                {/* Mode indicators for collapsed view */}
+                <div className="absolute -top-1 -right-1 flex flex-col space-y-0.5">
+                  {(session.ragMessages && session.ragMessages.length > 0) && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-teal-400" title="Has RAG messages" />
+                  )}
+                  {(session.ingestionMessages && session.ingestionMessages.length > 0) && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Ingestion messages" />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
