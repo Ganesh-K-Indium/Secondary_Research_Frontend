@@ -5,10 +5,41 @@ import { exportChatHistory } from "../utils/logger"; // Import logger utilities
 export default function ChatInterface({ serverUrl, mode, messages, setMessages, sessionId, onSessionUpdate }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const messagesEndRef = useRef(null);
 
   // Ensure messages is always an array
   const safeMessages = messages || [];
+
+  // Loading messages that rotate during processing
+  const loadingMessages = mode === 'rag' ? [
+    "Searching knowledge base",
+    "Analyzing your question",
+    "Finding relevant information",
+    "Processing documents",
+    "Preparing detailed response",
+    "Almost ready"
+  ] : [
+    "Processing your input",
+    "Analyzing content structure",
+    "Extracting key information",
+    "Organizing data points",
+    "Finalizing ingestion",
+    "Almost complete"
+  ];
+
+  // Rotate loading messages every 2 seconds
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+      }, 2000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [loading, loadingMessages.length]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -155,6 +186,14 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
 
   return (
     <div className="flex flex-col h-full">
+      <style>
+        {`
+          @keyframes opacity-fade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+          }
+        `}
+      </style>
       {/* Enhanced Chatbot Header */}
       <div className="bg-gradient-to-r from-gray-800 via-gray-750 to-gray-800 border-b border-gray-700/50 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -399,14 +438,33 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
 
         {loading && (
           <div className="flex justify-start">
-            <div className="p-3 rounded-xl max-w-lg bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-lg border border-gray-600/30" 
+            <div className="p-4 rounded-xl max-w-lg bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-lg border border-gray-600/30" 
                  style={{ maxWidth: "85%" }}>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-300">AI Assistant</span>
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
-                  <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" style={{ animationDelay: "300ms" }}></div>
-                  <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" style={{ animationDelay: "600ms" }}></div>
+              <div className="text-sm mb-2">
+                <span className="text-gray-300">AI Assistant</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-base leading-relaxed text-white transition-opacity duration-500">
+                    {loadingMessages[loadingMessageIndex]}
+                  </div>
+                </div>
+                <div className="flex items-center space-x-1 flex-shrink-0">
+                  <div className="w-2 h-2 rounded-full bg-teal-400" 
+                       style={{ 
+                         animation: "opacity-fade 1.5s ease-in-out infinite",
+                         animationDelay: "0ms"
+                       }}></div>
+                  <div className="w-2 h-2 rounded-full bg-teal-400" 
+                       style={{ 
+                         animation: "opacity-fade 1.5s ease-in-out infinite",
+                         animationDelay: "500ms"
+                       }}></div>
+                  <div className="w-2 h-2 rounded-full bg-teal-400" 
+                       style={{ 
+                         animation: "opacity-fade 1.5s ease-in-out infinite",
+                         animationDelay: "1000ms"
+                       }}></div>
                 </div>
               </div>
             </div>
