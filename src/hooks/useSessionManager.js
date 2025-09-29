@@ -5,6 +5,16 @@ const generateSessionId = () => {
   return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 };
 
+// Generate unique user ID - persistent per browser session
+const generateUserId = () => {
+  let userId = localStorage.getItem('user_id');
+  if (!userId) {
+    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('user_id', userId);
+  }
+  return userId;
+};
+
 // Generate session name based on first message
 const generateSessionName = (messages) => {
   if (messages.length > 0) {
@@ -170,6 +180,11 @@ export function useSessionManager() {
     return duplicatedSession;
   };
 
+  // Get or generate user ID
+  const getUserId = () => {
+    return generateUserId();
+  };
+
   return {
     sessions,
     currentSessionId,
@@ -181,6 +196,7 @@ export function useSessionManager() {
     renameSession,
     clearAllSessions,
     getSessionsByMode,
-    duplicateSession
+    duplicateSession,
+    getUserId
   };
 }

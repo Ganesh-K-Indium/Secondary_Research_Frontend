@@ -4,7 +4,7 @@ import ChatInterface from "./ChatInterface";
 const RAG_URL = process.env.REACT_APP_RAG_URL || "http://localhost:8001/ask";
 const INGESTION_URL = process.env.REACT_APP_INGESTION_SERVER_URL || "http://localhost:8000/ingest";
 
-export function RagChat({ messages, setMessages, sessionId, onSessionUpdate }) {
+export function RagChat({ messages, setMessages, sessionId, onSessionUpdate, getUserId }) {
   return (
     <ChatInterface 
       serverUrl={RAG_URL} 
@@ -13,11 +13,12 @@ export function RagChat({ messages, setMessages, sessionId, onSessionUpdate }) {
       setMessages={setMessages}
       sessionId={sessionId}
       onSessionUpdate={(id, msgs, mode) => onSessionUpdate(id, msgs, 'rag')}
+      getUserId={getUserId}
     />
   );
 }
 
-export function IngestionChat({ messages, setMessages, sessionId, onSessionUpdate }) {
+export function IngestionChat({ messages, setMessages, sessionId, onSessionUpdate, getUserId }) {
   return (
     <ChatInterface 
       serverUrl={INGESTION_URL} 
@@ -26,6 +27,7 @@ export function IngestionChat({ messages, setMessages, sessionId, onSessionUpdat
       setMessages={setMessages}
       sessionId={sessionId}
       onSessionUpdate={(id, msgs, mode) => onSessionUpdate(id, msgs, 'ingestion')}
+      getUserId={getUserId}
     />
   );
 }

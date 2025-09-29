@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { formatRagResponseForChat } from "../utils"; // Correct import
 import { exportChatHistory } from "../utils/logger"; // Import logger utilities
 
-export default function ChatInterface({ serverUrl, mode, messages, setMessages, sessionId, onSessionUpdate }) {
+export default function ChatInterface({ serverUrl, mode, messages, setMessages, sessionId, onSessionUpdate, getUserId }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const messagesEndRef = useRef(null);
 
   // Ensure messages is always an array
-  const safeMessages = messages || [];
+  const safeMessages = useMemo(() => messages || [], [messages]);
 
   // Loading messages that rotate during processing
   const loadingMessages = mode === 'rag' ? [
@@ -69,46 +69,141 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
 
     try {
       if (mode === "rag") {
-  const res = await fetch(serverUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: input }),
-  });
+        // Get user ID for the request
+        const userId = getUserId ? getUserId() : `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        const requestPayload = {
+          query: input,
+          user_id: userId,
+          extra_inputs: {} // Can be extended for additional inputs
+        };
 
-  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const res = await fetch(serverUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestPayload),
+        });
 
-  const data = await res.json();
-  const { answer, related, citations } = formatRagResponseForChat(data);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-  // Build display string - only show answer and citations
-  let formattedText = answer;
+        const data = await res.json();
+        
+        // Debug logging for new API response
+        console.log('RAG API Response:', {
+          routing_decision: data.routing_decision,
+          documents_used: data.documents_used,
+          session_info: data.session_info,
+          answer_type: typeof data.answer,
+          citations_count: data.citations?.length || 0,
+          documents_count: data.documents?.length || 0
+        });
+        
+        // Use the updated formatting function
+        const { answer, citations, documents, performance, session_info } = formatRagResponseForChat(data);
+        
+        // Fallback error handling
+        if (!answer) {
+          console.warn('No answer found in response:', data);
+          const fallbackAnswer = "I apologize, but I couldn't process your request properly. Please try again.";
+          const errorMessage = { 
+            sender: "bot", 
+            text: fallbackAnswer,
+            timestamp: Date.now(),
+            metadata: { error: true }
+          };
+          const errorMessages = [...updatedMessages, errorMessage];
+          setMessages(errorMessages);
+          if (sessionId && onSessionUpdate) {
+            onSessionUpdate(sessionId, errorMessages, mode);
+          }
+          return;
+        }
 
-  // Only add citations section if we have valid citations with content
-  if (citations.length > 0 && citations.some(c => c.file)) {
-    formattedText += `\n\n**Citations:**\n`;
-    citations.forEach((c, idx) => {
-      if (c.file) {
-        formattedText += `\n${idx + 1}. ${c.file}`;
-        if (c.page) formattedText += ` (Page ${c.page})`;
-        if (c.image) formattedText += `\n   📷 Image: ${c.image}`;
-      }
-    });
-  }
+        // Build formatted response with comprehensive information
+        let formattedText = answer;
 
-  const botMessage = { 
-    sender: "bot", 
-    text: formattedText,
-    timestamp: Date.now()
-  };
-  const finalMessages = [...updatedMessages, botMessage];
-  setMessages(finalMessages);
-  
-  // Update session with bot response
-  if (sessionId && onSessionUpdate) {
-    onSessionUpdate(sessionId, finalMessages, mode);
-  }
+        // Add performance information for transparency
+        if (performance.routing_decision !== 'unknown') {
+          console.log(`Query processed via: ${performance.routing_decision}`);
+          console.log(`Documents analyzed: ${performance.documents_used}`);
+          console.log('Performance metrics:', performance.performance_metrics);
+        }
+
+        // Add documents section if available
+        if (documents.length > 0) {
+          formattedText += `\n\n**📄 Documents Analyzed (${documents.length}):**\n`;
+          documents.slice(0, 3).forEach((doc, idx) => { // Show max 3 documents
+            formattedText += `\n${idx + 1}. **${doc.source}**`;
+            if (doc.metadata?.page) {
+              formattedText += ` (Page ${doc.metadata.page})`;
+            }
+            if (doc.content && doc.content.length > 0) {
+              const preview = doc.content.length > 150 ? 
+                doc.content.substring(0, 150) + "..." : doc.content;
+              formattedText += `\n   *${preview}*`;
+            }
+          });
+          if (documents.length > 3) {
+            formattedText += `\n   *...and ${documents.length - 3} more documents*`;
+          }
+        }
+
+        // Add citations section with enhanced information
+        if (citations.length > 0) {
+          formattedText += `\n\n**📚 Sources & Citations:**\n`;
+          const uniqueCitations = citations.filter((citation, index, self) => 
+            index === self.findIndex(c => c.file === citation.file && c.page === citation.page)
+          );
+          
+          uniqueCitations.forEach((citation, idx) => {
+            formattedText += `\n**${idx + 1}. ${citation.file}**`;
+            if (citation.page) {
+              formattedText += ` (Page ${citation.page})`;
+            }
+            if (citation.content && citation.content.trim()) {
+              formattedText += `\n   *"${citation.content}"*`;
+            }
+            if (citation.image) {
+              formattedText += `\n   📷 [Image Reference](${citation.image})`;
+            }
+          });
+        }
+
+        // Add cross-reference analysis if available
+        if (performance.cross_reference_analysis && 
+            Object.keys(performance.cross_reference_analysis).length > 0) {
+          console.log('Cross-reference analysis:', performance.cross_reference_analysis);
+        }
+
+        // Add tool calls information if available
+        if (performance.tool_calls && performance.tool_calls.length > 0) {
+          console.log(`Tools used: ${performance.tool_calls.join(', ')}`);
+        }
+
+        const botMessage = { 
+          sender: "bot", 
+          text: formattedText,
+          timestamp: Date.now(),
+          metadata: {
+            routing_decision: performance.routing_decision,
+            documents_used: performance.documents_used,
+            session_info: session_info,
+            performance: performance,
+            citations_count: citations.length,
+            documents_count: documents.length
+          }
+        };
+        const finalMessages = [...updatedMessages, botMessage];
+        setMessages(finalMessages);
+        
+        // Update session with bot response
+        if (sessionId && onSessionUpdate) {
+          onSessionUpdate(sessionId, finalMessages, mode);
+        }
 } else {
         try {
+          // For ingestion, we might also want to include user_id in the future
+          // const userId = getUserId ? getUserId() : `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           const res = await fetch(`${serverUrl}?query=${encodeURIComponent(input)}`);
           
           if (!res.ok) {

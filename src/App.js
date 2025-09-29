@@ -18,7 +18,8 @@ function App() {
     switchToSession,
     updateSessionMessages,
     deleteSession,
-    renameSession
+    renameSession,
+    getUserId
   } = useSessionManager();
 
   // Run migration on app start if needed
@@ -136,6 +137,7 @@ function App() {
                 setMessages={setCurrentMessages}
                 sessionId={currentSessionId}
                 onSessionUpdate={handleSessionUpdate}
+                getUserId={getUserId}
               />
             </div>
 
@@ -151,6 +153,7 @@ function App() {
                 setMessages={setCurrentMessages}
                 sessionId={currentSessionId}
                 onSessionUpdate={handleSessionUpdate}
+                getUserId={getUserId}
               />
             </div>
           </div>
