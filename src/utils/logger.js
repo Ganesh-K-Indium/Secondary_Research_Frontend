@@ -258,9 +258,11 @@ export function exportChatHistory(messages, mode = 'rag') {
   downloadFile(mdContent, filename);
 }
 
-export default {
+const loggerUtils = {
   logResponse,
   exportChatHistory,
   formatGraphOutput,
   formatIngestionOutput
 };
+
+export default loggerUtils;

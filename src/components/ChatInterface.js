@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { formatRagResponseForChat } from "../utils"; // Correct import
 import { exportChatHistory } from "../utils/logger"; // Import logger utilities
 
@@ -9,7 +9,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   const messagesEndRef = useRef(null);
 
   // Ensure messages is always an array
-  const safeMessages = messages || [];
+  const safeMessages = useMemo(() => messages || [], [messages]);
 
   // Loading messages that rotate during processing
   const loadingMessages = mode === 'rag' ? [
@@ -44,7 +44,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [safeMessages]);
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -78,7 +78,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
   const data = await res.json();
-  const { answer, related, citations } = formatRagResponseForChat(data);
+  const { answer, citations } = formatRagResponseForChat(data);
 
   // Build display string - only show answer and citations
   let formattedText = answer;
