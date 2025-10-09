@@ -8,6 +8,71 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const messagesEndRef = useRef(null);
 
+  // Helper function to format ingestion content with bold and links
+  const formatIngestionContent = (text) => {
+    // Handle links first: [text](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
+        parts.push(formatBoldText(text.slice(lastIndex, match.index)));
+      }
+      // Add the link
+      parts.push(
+        <a
+          key={match.index}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-teal-400 hover:text-teal-300 underline"
+        >
+          {match[1]}
+        </a>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(formatBoldText(text.slice(lastIndex)));
+    }
+
+    return parts.length > 0 ? parts : formatBoldText(text);
+  };
+
+  // Helper function to format bold text
+  const formatBoldText = (text) => {
+    const boldRegex = /\*\*([^*]+)\*\*/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = boldRegex.exec(text)) !== null) {
+      // Add text before the bold
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      // Add the bold text
+      parts.push(
+        <strong key={match.index} className="font-semibold text-white">
+          {match[1]}
+        </strong>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
+
   // Ensure messages is always an array
   const safeMessages = useMemo(() => messages || [], [messages]);
 
@@ -109,43 +174,43 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   }
 } else {
         try {
-          const res = await fetch(`${serverUrl}?query=${encodeURIComponent(input)}`);
+          const res = await fetch(serverUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              message: input,
+              session_id: sessionId 
+            }),
+          });
           
           if (!res.ok) {
-            throw new Error(`Ingestion server error: ${res.status}`);
+            throw new Error(`Chat server error: ${res.status}`);
           }
           
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder("utf-8");
-          let decoded = "";
+          const data = await res.json();
           
-          // Add initial bot message for streaming
-          const initialBotMessage = { sender: "bot", text: "Processing...", partial: true, timestamp: Date.now() };
-          const messagesWithBot = [...updatedMessages, initialBotMessage];
-          
-          setMessages(messagesWithBot);
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            decoded += decoder.decode(value, { stream: true });
-
-            // Update the last bot message with streaming content
-            setMessages([...updatedMessages, { sender: "bot", text: decoded, partial: true, timestamp: Date.now() }]);
+          if (!data.success) {
+            throw new Error("Chat request failed");
           }
-
-          // finalize the response
-          const finalMessages = [...updatedMessages, { sender: "bot", text: decoded, timestamp: Date.now() }];
           
+          const botMessage = { 
+            sender: "bot", 
+            text: data.response,
+            timestamp: Date.now()
+          };
+          const finalMessages = [...updatedMessages, botMessage];
           setMessages(finalMessages);
           
-          // Update session with final response
-          if (sessionId && onSessionUpdate) {
+          // Update session with bot response
+          if (data.session_id && data.session_id !== sessionId && onSessionUpdate) {
+            // If new session_id returned, update it
+            onSessionUpdate(data.session_id, finalMessages, mode);
+          } else if (sessionId && onSessionUpdate) {
             onSessionUpdate(sessionId, finalMessages, mode);
           }
-        } catch (streamError) {
-          console.error('Streaming error:', streamError);
-          throw streamError;
+        } catch (chatError) {
+          console.error('Chat error:', chatError);
+          throw chatError;
         }
 
 
@@ -328,10 +393,47 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               </div>
               <div className="text-base leading-relaxed">
                 {mode === 'ingestion' && msg.sender === 'bot' ? (
-                  // Special handling for ingestion streaming responses
-                  <div className="whitespace-pre-wrap ">
-                    {msg.text}
-                  </div>
+                  // Enhanced formatting for ingestion responses
+                  msg.text.split('\n\n').map((block, blockIdx) => (
+                    <div key={blockIdx} className={blockIdx > 0 ? 'mt-4' : ''}>
+                      {block.split('\n').map((line, lineIdx) => {
+                        // Handle numbered lists
+                        if (line.match(/^\s*\d+\.\s+/)) {
+                          const match = line.match(/^\s*(\d+)\.\s+(.+)/);
+                          if (match) {
+                            const [, number, content] = match;
+                            const formattedContent = formatIngestionContent(content);
+                            return (
+                              <div key={lineIdx} className="flex items-start space-x-2 mb-2">
+                                <span className="text-teal-400 font-medium flex-shrink-0">{number}.</span>
+                                <span>{formattedContent}</span>
+                              </div>
+                            );
+                          }
+                        }
+                        
+                        // Handle bullet points
+                        if (line.match(/^\s*[-•*]\s+/)) {
+                          const content = line.replace(/^\s*[-•*]\s+/, '');
+                          const formattedContent = formatIngestionContent(content);
+                          return (
+                            <div key={lineIdx} className="flex items-start space-x-2 mb-1">
+                              <span className="text-teal-400 mt-1 flex-shrink-0">•</span>
+                              <span>{formattedContent}</span>
+                            </div>
+                          );
+                        }
+                        
+                        // Handle regular lines
+                        const formattedLine = formatIngestionContent(line);
+                        return (
+                          <div key={lineIdx} className={line.trim() ? 'mb-1' : 'mb-2'}>
+                            {formattedLine}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))
                 ) : (
                   // Normal handling for RAG responses with markdown-like formatting
                   msg.text.split('\n\n').map((block, blockIdx) => {
