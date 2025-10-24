@@ -7,20 +7,30 @@
  * }
  */
 export function formatRagResponseForChat(data) {
-  const answerData = data.answer || {};
   let answer = "";
   let related = [];
   let citations = [];
 
   // --- Final AI answer ---
-  if (answerData.messages && Array.isArray(answerData.messages)) {
-    const aiMessages = answerData.messages.filter((msg) => msg.type === "ai");
-    if (aiMessages.length > 0) {
-      answer = aiMessages[aiMessages.length - 1].content?.trim() || "";
+  // Handle both old format (nested in answer object) and new format (direct fields)
+  if (data.answer && typeof data.answer === 'object' && data.answer.messages) {
+    // Old format: answer is an object with messages
+    const answerData = data.answer;
+    if (answerData.messages && Array.isArray(answerData.messages)) {
+      const aiMessages = answerData.messages.filter((msg) => msg.type === "ai");
+      if (aiMessages.length > 0) {
+        answer = aiMessages[aiMessages.length - 1].content?.trim() || "";
+      }
     }
-  }
-  if (!answer && answerData.Intermediate_message) {
-    answer = answerData.Intermediate_message.trim();
+    if (!answer && answerData.Intermediate_message) {
+      answer = answerData.Intermediate_message.trim();
+    }
+  } else if (data.answer && typeof data.answer === 'string') {
+    // New format: answer is directly a string
+    answer = data.answer.trim();
+  } else if (data.intermediate_message) {
+    // Fallback to intermediate_message
+    answer = data.intermediate_message.trim();
   }
 
   // Clean up answer: remove markdown headers and unwanted formatting
@@ -55,8 +65,11 @@ export function formatRagResponseForChat(data) {
   }
 
   // --- Citations ---
-  if (answerData.documents && Array.isArray(answerData.documents)) {
-    const validCitations = answerData.documents
+  // Handle both old format (nested in answer.documents) and new format (direct documents field)
+  const documents = (data.answer && data.answer.documents) ? data.answer.documents : data.documents;
+
+  if (documents && Array.isArray(documents)) {
+    const validCitations = documents
       .filter((doc) => {
         // Ensure document has valid content and metadata
         if (!doc.page_content || typeof doc.page_content !== 'string') return false;

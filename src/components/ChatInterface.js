@@ -137,7 +137,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   const res = await fetch(serverUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: input }),
+    body: JSON.stringify({ 
+      query: input,
+      thread_id: sessionId 
+    }),
   });
 
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -169,7 +172,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   setMessages(finalMessages);
   
   // Update session with bot response
-  if (sessionId && onSessionUpdate) {
+  if (data.thread_id && data.thread_id !== sessionId && onSessionUpdate) {
+    // If new thread_id returned, update it
+    onSessionUpdate(data.thread_id, finalMessages, mode);
+  } else if (sessionId && onSessionUpdate) {
     onSessionUpdate(sessionId, finalMessages, mode);
   }
 } else {

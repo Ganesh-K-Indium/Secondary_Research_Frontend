@@ -16,11 +16,13 @@ function Lander({ onStartChat }) {
 
           <div className="grid md:grid-cols-2 gap-6 mt-12">
             {/* RAG Chat Card */}
-            <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <h2 className="text-2xl font-bold text-teal-400 mb-3">RAG Chat</h2>
-              <p className="text-gray-400 mb-4">
-                Chat with an AI that has access to your knowledge base for more accurate and contextual responses.
-              </p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-teal-400 mb-3">RAG Chat</h2>
+                <p className="text-gray-400 mb-4">
+                  Chat with an AI that has access to your knowledge base for more accurate and contextual responses.
+                </p>
+              </div>
               <button
                 onClick={() => onStartChat("rag")}
                 className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors duration-200"
@@ -30,11 +32,13 @@ function Lander({ onStartChat }) {
             </div>
 
             {/* Ingestion Chat Card */}
-            <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <h2 className="text-2xl font-bold text-blue-400 mb-3">Ingestion Chat</h2>
-              <p className="text-gray-400 mb-4">
-                Help improve the system by providing new information through natural conversation.
-              </p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-blue-400 mb-3">Ingestion Chat</h2>
+                <p className="text-gray-400 mb-4">
+                  Help improve the system by providing new information and knowledge through natural conversation.
+                </p>
+              </div>
               <button
                 onClick={() => onStartChat("ingestion")}
                 className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200"
