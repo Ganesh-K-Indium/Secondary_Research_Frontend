@@ -3,13 +3,15 @@
  * {
  *   answer: string,
  *   related: [string],
- *   citations: [{ file, page, image }]
+ *   citations: [{ file, page, image }],
+ *   documentMetadata: array of document metadata objects
  * }
  */
 export function formatRagResponseForChat(data) {
   let answer = "";
   let related = [];
   let citations = [];
+  let documentMetadata = [];
 
   // --- Final AI answer ---
   // Handle both old format (nested in answer object) and new format (direct fields)
@@ -39,14 +41,14 @@ export function formatRagResponseForChat(data) {
     answer = answer.replace(/^#{1,6}\s+/gm, '');
     // Remove any remaining markdown-style headers
     answer = answer.replace(/^[-=]{3,}$/gm, '');
-    
+
     // Handle FoA and similar patterns intelligently
     // Only remove lines with broken formatting like "Family of Apps (FoA): - **Revenue**: -"
     answer = answer.replace(/^[^:\n]*:\s*-\s*\*\*[^:]*\*\*:\s*-\s*$/gm, '');
-    
+
     // Bold headings that end with ": -" pattern (but don't already have **)
     answer = answer.replace(/^([^:\n*]+:\s*-)\s*$/gm, '**$1**');
-    
+
     // Clean up extra whitespace
     answer = answer.replace(/\n{3,}/g, '\n\n').trim();
   }
@@ -64,42 +66,51 @@ export function formatRagResponseForChat(data) {
     }
   }
 
-  // --- Citations ---
+  // --- Citations and Document Metadata ---
   // Handle both old format (nested in answer.documents) and new format (direct documents field)
   const documents = (data.answer && data.answer.documents) ? data.answer.documents : data.documents;
 
   if (documents && Array.isArray(documents)) {
-    const validCitations = documents
+    const validDocuments = documents
       .filter((doc) => {
         // Ensure document has valid content and metadata
-        if (!doc.page_content || typeof doc.page_content !== 'string') return false;
+        // Check for both 'content' and 'page_content' properties
+        const content = doc.content || doc.page_content;
+        if (!content || typeof content !== 'string') return false;
         if (!doc.metadata || typeof doc.metadata !== 'object') return false;
 
-        const content = doc.page_content;
         const meta = doc.metadata;
 
         // Filter out image captions and invalid entries
         if (content.includes("This is an image with the caption:")) return false;
         if (content.includes("10k_PDFs/meta/image")) return false;
-        
+
         // Ensure we have at least one valid source identifier
         return !!(meta.source_file || meta.file || meta.title || meta.url);
-      })
-      .map((doc) => {
-        const meta = doc.metadata;
-        const citation = {
-          file: meta.source_file || meta.file || meta.title || '',
-          page: meta.page_num || null,
-          image: null
-        };
-
-        // Only include image URL if it's a valid image source
-        if (meta.image_url && !meta.image_url.includes('10k_PDFs/meta/image')) {
-          citation.image = meta.image_url;
-        }
-
-        return citation;
       });
+
+    // Extract document metadata for display
+    documentMetadata = validDocuments.map((doc, index) => ({
+      index: index + 1,
+      metadata: doc.metadata
+    }));
+
+    // Create citations for backward compatibility
+    const validCitations = validDocuments.map((doc) => {
+      const meta = doc.metadata;
+      const citation = {
+        file: meta.source_file || meta.file || meta.title || '',
+        page: meta.page_num || null,
+        image: null
+      };
+
+      // Only include image URL if it's a valid image source
+      if (meta.image_url && !meta.image_url.includes('10k_PDFs/meta/image')) {
+        citation.image = meta.image_url;
+      }
+
+      return citation;
+    });
 
     // Only assign citations if we have valid ones
     if (validCitations.length > 0) {
@@ -107,5 +118,5 @@ export function formatRagResponseForChat(data) {
     }
   }
 
-  return { answer, related, citations };
+  return { answer, related, citations, documentMetadata };
 }

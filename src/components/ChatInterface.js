@@ -146,11 +146,11 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
   const data = await res.json();
-  const { answer, citations } = formatRagResponseForChat(data);
+  const { answer, citations} = formatRagResponseForChat(data);
 
-  // Build display string - only show answer and citations
-  let formattedText = answer;
-
+  // Build display string - show answer, citations, and document metadata
+  let formattedText = answer; 
+ 
   // Only add citations section if we have valid citations with content
   if (citations.length > 0 && citations.some(c => c.file)) {
     formattedText += `\n\n**Citations:**\n`;
@@ -162,6 +162,13 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
       }
     });
   }
+
+  // Add document metadata section if available
+  /*if (documentMetadata && documentMetadata.length > 0) {
+    documentMetadata.forEach((doc) => {
+      formattedText += `\n\n### Document ${doc.index}\n**Metadata:**\n\`\`\`json\n${JSON.stringify(doc.metadata, null, 2)}\n\`\`\``;
+    });
+  }*/
 
   const botMessage = { 
     sender: "bot", 
@@ -454,6 +461,22 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                               </div>
                             ))}
                           </div>
+                        </div>
+                      );
+                    } else if (block.startsWith('### Document')) {
+                      // Handle document metadata sections
+                      const lines = block.split('\n');
+                      const header = lines[0]; // "### Document X"
+                      const metadataLabel = lines[1]; // "**Metadata:**"
+                      const jsonContent = lines.slice(2).join('\n'); // JSON content starting from ```
+                      
+                      return (
+                        <div key={blockIdx} className="mt-4 pt-3 border-t border-gray-600/30">
+                          <div className="font-semibold mb-2 text-gray-300">{header.replace('### ', '')}</div>
+                          <div className="text-sm text-gray-400 mb-1">{metadataLabel.replace(/\*\*/g, '')}</div>
+                          <pre className="bg-gray-800 p-3 rounded-lg text-xs text-gray-200 overflow-x-auto border border-gray-600/30">
+                            <code>{jsonContent.replace(/```\w*\n?/g, '').trim()}</code>
+                          </pre>
                         </div>
                       );
                     } else {
