@@ -1,70 +1,212 @@
-# Getting Started with Create React App
+# Secondary Research Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern React-based frontend for an intelligent research assistant that combines Retrieval-Augmented Generation (RAG) with multi-source data integration capabilities.
 
-## Available Scripts
+![React](https://img.shields.io/badge/React-19.1.1-blue.svg)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.17-38B2AC.svg)
+![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000.svg)
 
-In the project directory, you can run:
+## 🌟 Features
 
-### `npm start`
+### 🤖 Dual Chat Modes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**Knowledge Assistant (RAG Mode)**
+- Intelligent document search and retrieval
+- Context-aware responses with source citations
+- Advanced document source display with metadata
+- Seamless knowledge discovery across your document library
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**Source Convergence Point (Data Sources Mode)**
+- Multi-agent coordination across enterprise platforms
+- Unified access to Jira, Confluence, SharePoint, and Google Drive
+- Intelligent data source orchestration
+- Cross-platform information synthesis
 
-### `npm test`
+### 💬 Advanced Chat Interface
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Session Management**: Persistent conversation threads with message history
+- **Real-time Updates**: Live message counts and mode indicators in sidebar
+- **Rich Formatting**: Enhanced text formatting with links, bold text, and structured lists
+- **Responsive Design**: Optimized for desktop and mobile experiences
 
-### `npm run build`
+### 📄 Document Integration
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **PDF Viewer**: Built-in PDF viewing capabilities with `@react-pdf-viewer`
+- **Source Attribution**: Clear document source display with metadata
+- **Multi-format Support**: Handles various document types and sources
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Quick Start
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+- Node.js 18+ and npm
+- Backend services running (see Environment Setup below)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Ganesh-K-Indium/Secondary_Research_Frontend.git
+   cd Secondary_Research_Frontend
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. **Start the development server**
+   ```bash
+   npm start
+   ```
 
-## Learn More
+4. **Open your browser**
+   ```
+   http://localhost:3000
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🔧 Environment Setup
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Backend Services
 
-### Code Splitting
+This frontend requires two backend services to be running:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. **RAG Backend** (Port 8020)
+   - Handles knowledge retrieval and document search
+   - Default URL: `http://localhost:8020/ask`
 
-### Analyzing the Bundle Size
+2. **Data Sources Backend** (Port 8006)
+   - Manages multi-agent data source coordination
+   - Default URL: `http://localhost:8006/chat`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Environment Variables
 
-### Making a Progressive Web App
+Create a `.env` file in the root directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```env
+# Backend URLs (optional - defaults provided)
+REACT_APP_RAG_URL=http://localhost:8020/ask
+REACT_APP_INGESTION_SERVER_URL=http://localhost:8006/chat
 
-### Advanced Configuration
+# Vercel deployment (for production)
+vercel_token=your_vercel_token
+VERCEL_ORG_ID=your_org_id
+VERCEL_PROJECT_ID=your_project_id
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🏗️ Architecture
 
-### Deployment
+```
+Frontend (React + Tailwind)
+├── Knowledge Assistant (RAG Mode)
+│   └── Connects to RAG Backend (Port 8020)
+└── Source Convergence Point (Data Sources Mode)
+    └── Connects to Data Sources Backend (Port 8006)
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Key Components
 
-### `npm run build` fails to minify
+- **ChatInterface**: Main chat component with mode-specific formatting
+- **SessionSidebar**: Session management with message counts and mode indicators
+- **StatefulChats**: Chat state management for RAG and Data Sources modes
+- **Session Management**: Persistent conversation threads with local storage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📱 Usage
+
+### Switching Between Modes
+
+1. **Knowledge Assistant**: For document search and retrieval with source citations
+2. **Source Convergence Point**: For coordinating across multiple enterprise data sources
+
+### Session Management
+
+- Create new chat sessions for different research topics
+- Switch between sessions while preserving conversation history
+- View message counts and active modes in the sidebar
+
+### Document Sources
+
+- RAG responses include clickable document sources with metadata
+- Data Sources mode provides unified access to enterprise platforms
+- All interactions are logged and persist across sessions
+
+## 🧪 Testing
+
+```bash
+# Run the test suite
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+
+# Run tests with coverage
+npm test -- --coverage
+```
+
+## 🚀 Deployment
+
+### Vercel (Production)
+
+The application is automatically deployed to Vercel via GitHub Actions:
+
+- **Production URL**: [https://secondary-research-frontend.vercel.app](https://secondary-research-frontend.vercel.app)
+- **CI/CD**: Automated deployment on pushes to `main` branch
+- **Build Command**: `npm run build`
+
+### Manual Deployment
+
+```bash
+# Build for production
+npm run build
+
+# Serve the build locally
+npm install -g serve
+serve -s build
+```
+
+## 🛠️ Development
+
+### Available Scripts
+
+- `npm start` - Start development server
+- `npm build` - Create production build
+- `npm test` - Run test suite
+- `npm eject` - Eject from Create React App (irreversible)
+
+### Tech Stack
+
+- **Frontend**: React 19.1.1 with Hooks
+- **Styling**: Tailwind CSS 3.4.17
+- **PDF Viewing**: @react-pdf-viewer
+- **Routing**: React Router DOM
+- **Build Tool**: Create React App
+- **Deployment**: Vercel with GitHub Actions CI/CD
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── ChatInterface.js          # Main chat component
+│   ├── SessionSidebar.js         # Session management sidebar
+│   ├── StatefulChats.js          # Chat state management
+│   ├── Navbar.js                 # Navigation component
+│   └── ...
+├── hooks/
+│   └── useSessionManager.js      # Session management hook
+├── utils/
+│   ├── utils.js                  # Utility functions
+│   ├── logger.js                 # Logging utilities
+│   └── migration.js              # Data migration logic
+└── assets/                       # Static assets
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+**Built with ❤️ for intelligent research and enterprise data integration**
