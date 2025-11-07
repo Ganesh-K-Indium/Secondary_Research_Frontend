@@ -50,11 +50,11 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                       {(currentSession.ragMessages && currentSession.ragMessages.length > 0) && (
                         <div className="w-1.5 h-1.5 rounded-full bg-teal-400" title="Has RAG messages" />
                       )}
-                      {(currentSession.ingestionMessages && currentSession.ingestionMessages.length > 0) && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Ingestion messages" />
+                      {(currentSession.dataSourcesMessages && currentSession.dataSourcesMessages.length > 0) && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Data Sources messages" />
                       )}
                       {(!currentSession.ragMessages || currentSession.ragMessages.length === 0) && 
-                       (!currentSession.ingestionMessages || currentSession.ingestionMessages.length === 0) && (
+                       (!currentSession.dataSourcesMessages || currentSession.dataSourcesMessages.length === 0) && (
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-400" title="Empty session" />
                       )}
                     </div>
@@ -82,7 +82,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-gray-800/30 border border-gray-700/30">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-medium text-gray-300 tracking-wide">
-                    {currentChat === "rag" ? "Search" : currentChat === "ingestion" ? "Input" : "Ready"}
+                    {currentChat === "rag" ? "Search" : currentChat === "dataSources" ? "Data Sources" : "Ready"}
                   </span>
                 </div>
               </div>
@@ -120,28 +120,28 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
               </button>
 
               <button
-                onClick={() => setCurrentChat("ingestion")}
+                onClick={() => setCurrentChat("dataSources")}
                 className="group relative"
               >
                 <div className={`px-3 py-2 rounded-lg flex items-center space-x-2 transition-all duration-300 relative z-10
-                  ${currentChat === "ingestion" 
+                  ${currentChat === "dataSources" 
                     ? "bg-gradient-to-r from-teal-500 to-teal-600 shadow-lg shadow-teal-500/25 text-white" 
                     : "text-gray-400 hover:text-white hover:bg-gray-700/50"}`}>
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300
-                    ${currentChat === "ingestion" 
+                    ${currentChat === "dataSources" 
                       ? "bg-white/20 shadow-sm" 
                       : "bg-gray-700/50 group-hover:bg-gray-600/50"}`}>
                     <svg className={`w-3.5 h-3.5 transition-colors duration-300`} 
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                   </div>
                   <div className="hidden md:flex flex-col items-start">
-                    <span className="text-xs font-semibold tracking-wide">Input</span>
+                    <span className="text-xs font-semibold tracking-wide">Data Sources</span>
                   </div>
                 </div>
-                {currentChat === "ingestion" && (
+                {currentChat === "dataSources" && (
                   <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-teal-600/20 rounded-lg blur-lg scale-110"></div>
                 )}
               </button>

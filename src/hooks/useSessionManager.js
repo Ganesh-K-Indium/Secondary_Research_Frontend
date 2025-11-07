@@ -45,14 +45,14 @@ export function useSessionManager() {
     return sessions.find(session => session.id === currentSessionId) || null;
   };
 
-  // Create new session - sessions can contain both RAG and Ingestion messages
+  // Create new session - sessions can contain both RAG and Data Sources messages
   const createNewSession = () => {
     const newSession = {
       id: generateSessionId(),
       name: 'New Chat Session',
       messages: [], // Will contain messages from both modes
       ragMessages: [], // Separate arrays for each mode
-      ingestionMessages: [],
+      dataSourcesMessages: [],
       createdAt: Date.now(),
       lastUpdated: Date.now()
     };
@@ -87,14 +87,14 @@ export function useSessionManager() {
         // Update messages for the specific mode
         if (mode === 'rag') {
           updatedSession.ragMessages = safeMessages;
-        } else if (mode === 'ingestion') {
-          updatedSession.ingestionMessages = safeMessages;
+        } else if (mode === 'dataSources') {
+          updatedSession.dataSourcesMessages = safeMessages;
         }
         
         // Combine all messages for display and naming
         const allMessages = [
           ...(updatedSession.ragMessages || []),
-          ...(updatedSession.ingestionMessages || [])
+          ...(updatedSession.dataSourcesMessages || [])
         ].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         
         updatedSession.messages = allMessages;

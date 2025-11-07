@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import SessionSidebar from "./components/SessionSidebar";
-import { RagChat, IngestionChat } from "./components/StatefulChats";
+import { RagChat, DataSourcesChat } from "./components/StatefulChats";
 import { useSessionManager } from "./hooks/useSessionManager";
 import { migrateOldMessagesToSessions, shouldMigrate } from "./utils/migration";
 import Lander from "./Lander";
@@ -38,8 +38,8 @@ function App() {
     
     if (currentChat === 'rag') {
       return Array.isArray(currentSession.ragMessages) ? currentSession.ragMessages : [];
-    } else if (currentChat === 'ingestion') {
-      return Array.isArray(currentSession.ingestionMessages) ? currentSession.ingestionMessages : [];
+    } else if (currentChat === 'dataSources') {
+      return Array.isArray(currentSession.dataSourcesMessages) ? currentSession.dataSourcesMessages : [];
     }
     return [];
   };
@@ -68,7 +68,7 @@ function App() {
   const handleSessionSelect = (sessionId) => {
     switchToSession(sessionId);
     // Don't change the current chat mode when switching sessions
-    // Users can freely switch between RAG and Ingestion within the same session
+    // Users can freely switch between RAG and Data Sources within the same session
   };
 
   const handleSessionUpdate = (sessionId, messages, mode) => {
@@ -141,12 +141,12 @@ function App() {
 
             <div
               className={`absolute inset-0 transition-opacity duration-300 ease-out ${
-                currentChat === "ingestion"
+                currentChat === "dataSources"
                   ? "opacity-100 z-10"
                   : "opacity-0 z-0 pointer-events-none"
               }`}
             >
-              <IngestionChat 
+              <DataSourcesChat 
                 messages={currentMessages} 
                 setMessages={setCurrentMessages}
                 sessionId={currentSessionId}

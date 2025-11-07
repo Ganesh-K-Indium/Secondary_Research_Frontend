@@ -11,7 +11,7 @@ function Lander({ onStartChat }) {
           
           <p className="text-xl text-gray-300">
             Experience intelligent conversations powered by advanced AI. Choose between RAG-enhanced responses 
-            or help train the system through ingestion chat.
+            or manage data sources through our multi-agent system.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mt-12">
@@ -31,19 +31,19 @@ function Lander({ onStartChat }) {
               </button>
             </div>
 
-            {/* Ingestion Chat Card */}
+            {/* Data Sources Card */}
             <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-blue-400 mb-3">Ingestion Chat</h2>
+                <h2 className="text-2xl font-bold text-blue-400 mb-3">Data Sources</h2>
                 <p className="text-gray-400 mb-4">
-                  Help improve the system by providing new information and knowledge through natural conversation.
+                  Manage and interact with multiple data sources including Jira, Confluence, SharePoint, and Google Drive through our MCP-powered multi-agent system.
                 </p>
               </div>
               <button
-                onClick={() => onStartChat("ingestion")}
+                onClick={() => onStartChat("dataSources")}
                 className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200"
               >
-                Start Ingestion Chat
+                Start Data Sources Chat
               </button>
             </div>
           </div>

@@ -48,7 +48,7 @@ export function migrateOldMessagesToSessions() {
           id: 'migrated_session_' + Date.now(),
           name: generateSessionNameFromMessages(allMessages),
           ragMessages: migratedRagMessages,
-          ingestionMessages: migratedIngestionMessages,
+          dataSourcesMessages: migratedIngestionMessages,
           messages: allMessages,
           createdAt: Date.now() - 86400000, // 1 day ago
           lastUpdated: Date.now()

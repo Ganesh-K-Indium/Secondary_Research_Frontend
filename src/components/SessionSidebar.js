@@ -134,7 +134,7 @@ export default function SessionSidebar({
                           {formatDate(session.lastUpdated)}
                         </p>
                         <p className="text-xs text-gray-500 truncate mt-1">
-                          RAG: {(session.ragMessages || []).length} • ING: {(session.ingestionMessages || []).length}
+                          RAG: {(session.ragMessages || []).length} • DS: {(session.dataSourcesMessages || []).length}
                         </p>
                       </div>
                       
@@ -171,8 +171,8 @@ export default function SessionSidebar({
                       {(session.ragMessages && session.ragMessages.length > 0) && (
                         <div className="w-2 h-2 rounded-full bg-teal-400" title="Has RAG messages" />
                       )}
-                      {(session.ingestionMessages && session.ingestionMessages.length > 0) && (
-                        <div className="w-2 h-2 rounded-full bg-blue-400" title="Has Ingestion messages" />
+                      {(session.dataSourcesMessages && session.dataSourcesMessages.length > 0) && (
+                        <div className="w-2 h-2 rounded-full bg-blue-400" title="Has Data Sources messages" />
                       )}
                     </div>
                   </>
@@ -215,8 +215,8 @@ export default function SessionSidebar({
                   {(session.ragMessages && session.ragMessages.length > 0) && (
                     <div className="w-1.5 h-1.5 rounded-full bg-teal-400" title="Has RAG messages" />
                   )}
-                  {(session.ingestionMessages && session.ingestionMessages.length > 0) && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Ingestion messages" />
+                  {(session.dataSourcesMessages && session.dataSourcesMessages.length > 0) && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Data Sources messages" />
                   )}
                 </div>
               </button>
