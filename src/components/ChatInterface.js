@@ -84,13 +84,20 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
     "Processing documents",
     "Preparing detailed response",
     "Almost ready"
-  ] : [
+  ] : mode === 'dataSources' ? [
     "Processing your request",
     "Coordinating data sources",
     "Executing operations",
     "Analyzing results",
     "Finalizing response",
     "Almost complete"
+  ] : [
+    "Analyzing stock data",
+    "Running quantitative models",
+    "Processing market information",
+    "Calculating metrics",
+    "Generating insights",
+    "Finalizing analysis"
   ];
 
   // Rotate loading messages every 2 seconds
@@ -284,10 +291,15 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                           d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
-                ) : (
+                ) : mode === 'dataSources' ? (
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                           d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                   </svg>
                 )}
               </div>
@@ -295,10 +307,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             </div>
             <div>
               <h2 className="text-lg font-semibold text-white">
-                {mode === 'rag' ? 'Knowledge Assistant' : 'Source Convergence Point'}
+                {mode === 'rag' ? 'Knowledge Assistant' : mode === 'dataSources' ? 'Source Convergence Point' : 'Quant Agent'}
               </h2>
               <p className="text-xs text-gray-400">
-                {mode === 'rag' ? 'Search & Discover Information' : 'Where All Data Sources Converge'}
+                {mode === 'rag' ? 'Search & Discover Information' : mode === 'dataSources' ? 'Where All Data Sources Converge' : 'Stock & Investment Analysis'}
               </p>
             </div>
           </div>
@@ -356,20 +368,27 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                ) : (
+                ) : mode === 'dataSources' ? (
                   <svg className="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
+                ) : (
+                  <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                          d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                  </svg>
                 )}
               </div>
               <h3 className="text-2xl font-semibold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent mb-4">
-                {mode === 'rag' ? 'Knowledge Base Search' : 'Data Source Operations'}
+                {mode === 'rag' ? 'Knowledge Base Search' : mode === 'dataSources' ? 'Data Source Operations' : 'Investment AI Analyst'}
               </h3>
               <p className="text-gray-300 mb-6 text-lg">
                 {mode === 'rag' 
                   ? 'Access information from the knowledge base by asking questions. Get accurate answers with relevant citations.'
-                  : 'Manage and coordinate operations across multiple data sources. Interact with Jira, Confluence, SharePoint, Google Drive, and more through our intelligent multi-agent system.'}
+                  : mode === 'dataSources'
+                  ? 'Manage and coordinate operations across multiple data sources. Interact with Jira, Confluence, SharePoint, Google Drive, and more through our intelligent multi-agent system.'
+                  : 'Get AI-powered stock analysis and investment insights. Ask about stock performance, market trends, financial metrics, and investment recommendations.'}
               </p>
               <div className="text-sm text-gray-400 flex items-center justify-center space-x-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -616,7 +635,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-              placeholder={`Type your message${mode === 'rag' ? ' to search knowledge base' : ' to contribute knowledge'}...`}
+              placeholder={`Type your message${mode === 'rag' ? ' to search knowledge base' : mode === 'dataSources' ? ' to contribute knowledge' : ' to analyze stocks'}...`}
               disabled={loading}
             />
           </div>

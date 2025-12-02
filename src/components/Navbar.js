@@ -53,8 +53,12 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                       {(currentSession.dataSourcesMessages && currentSession.dataSourcesMessages.length > 0) && (
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Data Sources messages" />
                       )}
+                      {(currentSession.quantAgentMessages && currentSession.quantAgentMessages.length > 0) && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" title="Has Quant Agent messages" />
+                      )}
                       {(!currentSession.ragMessages || currentSession.ragMessages.length === 0) && 
-                       (!currentSession.dataSourcesMessages || currentSession.dataSourcesMessages.length === 0) && (
+                       (!currentSession.dataSourcesMessages || currentSession.dataSourcesMessages.length === 0) &&
+                       (!currentSession.quantAgentMessages || currentSession.quantAgentMessages.length === 0) && (
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-400" title="Empty session" />
                       )}
                     </div>
@@ -82,7 +86,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-gray-800/30 border border-gray-700/30">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-medium text-gray-300 tracking-wide">
-                    {currentChat === "rag" ? "Search" : currentChat === "dataSources" ? "Data Sources" : "Ready"}
+                    {currentChat === "rag" ? "Search" : currentChat === "dataSources" ? "Data Sources" : currentChat === "quantAgent" ? "Quant Agent" : "Ready"}
                   </span>
                 </div>
               </div>
@@ -143,6 +147,33 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 </div>
                 {currentChat === "dataSources" && (
                   <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-teal-600/20 rounded-lg blur-lg scale-110"></div>
+                )}
+              </button>
+
+              <button
+                onClick={() => setCurrentChat("quantAgent")}
+                className="group relative"
+              >
+                <div className={`px-3 py-2 rounded-lg flex items-center space-x-2 transition-all duration-300 relative z-10
+                  ${currentChat === "quantAgent" 
+                    ? "bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg shadow-purple-500/25 text-white" 
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"}`}>
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300
+                    ${currentChat === "quantAgent" 
+                      ? "bg-white/20 shadow-sm" 
+                      : "bg-gray-700/50 group-hover:bg-gray-600/50"}`}>
+                    <svg className={`w-3.5 h-3.5 transition-colors duration-300`} 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                  </div>
+                  <div className="hidden md:flex flex-col items-start">
+                    <span className="text-xs font-semibold tracking-wide">Quant Agent</span>
+                  </div>
+                </div>
+                {currentChat === "quantAgent" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-lg blur-lg scale-110"></div>
                 )}
               </button>
             </div>

@@ -45,14 +45,15 @@ export function useSessionManager() {
     return sessions.find(session => session.id === currentSessionId) || null;
   };
 
-  // Create new session - sessions can contain both RAG and Data Sources messages
+  // Create new session - sessions can contain RAG, Data Sources, and Quant Agent messages
   const createNewSession = () => {
     const newSession = {
       id: generateSessionId(),
       name: 'New Chat Session',
-      messages: [], // Will contain messages from both modes
+      messages: [], // Will contain messages from all modes
       ragMessages: [], // Separate arrays for each mode
       dataSourcesMessages: [],
+      quantAgentMessages: [], // Quant Agent messages
       createdAt: Date.now(),
       lastUpdated: Date.now()
     };
@@ -89,12 +90,15 @@ export function useSessionManager() {
           updatedSession.ragMessages = safeMessages;
         } else if (mode === 'dataSources') {
           updatedSession.dataSourcesMessages = safeMessages;
+        } else if (mode === 'quantAgent') {
+          updatedSession.quantAgentMessages = safeMessages;
         }
         
         // Combine all messages for display and naming
         const allMessages = [
           ...(updatedSession.ragMessages || []),
-          ...(updatedSession.dataSourcesMessages || [])
+          ...(updatedSession.dataSourcesMessages || []),
+          ...(updatedSession.quantAgentMessages || [])
         ].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         
         updatedSession.messages = allMessages;

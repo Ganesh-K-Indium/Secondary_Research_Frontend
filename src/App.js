@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import SessionSidebar from "./components/SessionSidebar";
-import { RagChat, DataSourcesChat } from "./components/StatefulChats";
+import { RagChat, DataSourcesChat, QuantAgentChat } from "./components/StatefulChats";
 import { useSessionManager } from "./hooks/useSessionManager";
 import { migrateOldMessagesToSessions, shouldMigrate } from "./utils/migration";
 import Lander from "./Lander";
@@ -40,6 +40,8 @@ function App() {
       return Array.isArray(currentSession.ragMessages) ? currentSession.ragMessages : [];
     } else if (currentChat === 'dataSources') {
       return Array.isArray(currentSession.dataSourcesMessages) ? currentSession.dataSourcesMessages : [];
+    } else if (currentChat === 'quantAgent') {
+      return Array.isArray(currentSession.quantAgentMessages) ? currentSession.quantAgentMessages : [];
     }
     return [];
   };
@@ -147,6 +149,21 @@ function App() {
               }`}
             >
               <DataSourcesChat 
+                messages={currentMessages} 
+                setMessages={setCurrentMessages}
+                sessionId={currentSessionId}
+                onSessionUpdate={handleSessionUpdate}
+              />
+            </div>
+
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ease-out ${
+                currentChat === "quantAgent"
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0 pointer-events-none"
+              }`}
+            >
+              <QuantAgentChat 
                 messages={currentMessages} 
                 setMessages={setCurrentMessages}
                 sessionId={currentSessionId}

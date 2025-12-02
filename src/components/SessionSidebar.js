@@ -134,7 +134,7 @@ export default function SessionSidebar({
                           {formatDate(session.lastUpdated)}
                         </p>
                         <p className="text-xs text-gray-500 truncate mt-1">
-                          RAG: {(session.ragMessages || []).length} • DS: {(session.dataSourcesMessages || []).length}
+                          RAG: {(session.ragMessages || []).length} • DS: {(session.dataSourcesMessages || []).length} • QA: {(session.quantAgentMessages || []).length}
                         </p>
                       </div>
                       
@@ -173,6 +173,9 @@ export default function SessionSidebar({
                       )}
                       {(session.dataSourcesMessages && session.dataSourcesMessages.length > 0) && (
                         <div className="w-2 h-2 rounded-full bg-blue-400" title="Has Data Sources messages" />
+                      )}
+                      {(session.quantAgentMessages && session.quantAgentMessages.length > 0) && (
+                        <div className="w-2 h-2 rounded-full bg-purple-400" title="Has Quant Agent messages" />
                       )}
                     </div>
                   </>
@@ -217,6 +220,9 @@ export default function SessionSidebar({
                   )}
                   {(session.dataSourcesMessages && session.dataSourcesMessages.length > 0) && (
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Data Sources messages" />
+                  )}
+                  {(session.quantAgentMessages && session.quantAgentMessages.length > 0) && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400" title="Has Quant Agent messages" />
                   )}
                 </div>
               </button>
