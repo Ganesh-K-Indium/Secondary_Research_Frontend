@@ -1,9 +1,8 @@
 import React from "react";
 import ChatInterface from "./ChatInterface";
-
-const RAG_URL = process.env.REACT_APP_RAG_URL || "http://localhost:8020/ask";
-const INGESTION_URL = process.env.REACT_APP_INGESTION_SERVER_URL || "http://localhost:8006/chat";
-const QUANT_AGENT_URL = process.env.REACT_APP_QUANT_AGENT_URL || "http://localhost:8567/chat";
+const RAG_URL = process.env.REACT_APP_RAG_URL;
+const INGESTION_URL = process.env.REACT_APP_INGESTION_SERVER_URL;
+const QUANT_AGENT_URL = process.env.REACT_APP_QUANT_AGENT_URL;
 
 export function RagChat({ messages, setMessages, sessionId, onSessionUpdate }) {
   return (
