@@ -141,14 +141,20 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
 
     try {
       if (mode === "rag") {
-  const res = await fetch(serverUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      query: input,
-      thread_id: sessionId 
-    }),
-  });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 70000);
+
+        const res = await fetch(serverUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            query: input,
+            thread_id: sessionId 
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
 
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
@@ -194,6 +200,9 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   }
 } else {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 70000);
+
           const res = await fetch(serverUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -201,7 +210,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               message: input,
               session_id: sessionId 
             }),
+            signal: controller.signal
           });
+
+          clearTimeout(timeoutId);
           
           if (!res.ok) {
             throw new Error(`Chat server error: ${res.status}`);
@@ -238,7 +250,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
     } catch (err) {
       const errorMessage = { 
         sender: "bot", 
-        text: `Error connecting to server: ${err.message}`,
+        text: `Error connecting to server: ${err.name === 'AbortError' ? 'Request timed out after 70 seconds' : err.message}`,
         timestamp: Date.now()
       };
       const errorMessages = [...updatedMessages, errorMessage];
