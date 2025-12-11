@@ -8,7 +8,7 @@ A modern React-based frontend for an intelligent research assistant that combine
 
 ## 🌟 Features
 
-### 🤖 Dual Chat Modes
+### 🤖 Three Chat Modes
 
 **Knowledge Assistant (RAG Mode)**
 - Intelligent document search and retrieval
@@ -21,6 +21,12 @@ A modern React-based frontend for an intelligent research assistant that combine
 - Unified access to Jira, Confluence, SharePoint, and Google Drive
 - Intelligent data source orchestration
 - Cross-platform information synthesis
+
+**Quant Agent (Quantitative Analysis Mode)**
+- Advanced quantitative modeling and analysis
+- Stock market analysis and financial data processing
+- Running quantitative models for data-driven insights
+- Specialized tools for financial research and analytics
 
 ### 💬 Advanced Chat Interface
 
@@ -69,7 +75,7 @@ A modern React-based frontend for an intelligent research assistant that combine
 
 ### Backend Services
 
-This frontend requires two backend services to be running:
+This frontend requires three backend services to be running:
 
 1. **RAG Backend** (Port 8020)
    - Handles knowledge retrieval and document search
@@ -79,6 +85,10 @@ This frontend requires two backend services to be running:
    - Manages multi-agent data source coordination
    - Default URL: `http://localhost:8006/chat`
 
+3. **Quant Agent Backend** (Port 8007)
+   - Provides quantitative analysis and financial modeling
+   - Default URL: `http://localhost:8007/quant`
+
 ### Environment Variables
 
 Create a `.env` file in the root directory:
@@ -87,6 +97,7 @@ Create a `.env` file in the root directory:
 # Backend URLs (optional - defaults provided)
 REACT_APP_RAG_URL=http://localhost:8020/ask
 REACT_APP_INGESTION_SERVER_URL=http://localhost:8006/chat
+REACT_APP_QUANT_AGENT_URL=http://localhost:8007/quant
 
 # Vercel deployment (for production)
 vercel_token=your_vercel_token
@@ -100,15 +111,17 @@ VERCEL_PROJECT_ID=your_project_id
 Frontend (React + Tailwind)
 ├── Knowledge Assistant (RAG Mode)
 │   └── Connects to RAG Backend (Port 8020)
-└── Source Convergence Point (Data Sources Mode)
-    └── Connects to Data Sources Backend (Port 8006)
+├── Source Convergence Point (Data Sources Mode)
+│   └── Connects to Data Sources Backend (Port 8006)
+└── Quant Agent (Quantitative Analysis Mode)
+    └── Connects to Quant Agent Backend (Port 8007)
 ```
 
 ### Key Components
 
 - **ChatInterface**: Main chat component with mode-specific formatting
 - **SessionSidebar**: Session management with message counts and mode indicators
-- **StatefulChats**: Chat state management for RAG and Data Sources modes
+- **StatefulChats**: Chat state management for RAG, Data Sources, and Quant Agent modes
 - **Session Management**: Persistent conversation threads with local storage
 
 ## 📱 Usage
@@ -117,12 +130,13 @@ Frontend (React + Tailwind)
 
 1. **Knowledge Assistant**: For document search and retrieval with source citations
 2. **Source Convergence Point**: For coordinating across multiple enterprise data sources
+3. **Quant Agent**: For quantitative analysis, stock market research, and financial modeling
 
 ### Session Management
 
 - Create new chat sessions for different research topics
 - Switch between sessions while preserving conversation history
-- View message counts and active modes in the sidebar
+- View message counts and active modes in the sidebar (RAG, DS, QA)
 
 ### Document Sources
 
@@ -189,7 +203,7 @@ src/
 ├── components/
 │   ├── ChatInterface.js          # Main chat component
 │   ├── SessionSidebar.js         # Session management sidebar
-│   ├── StatefulChats.js          # Chat state management
+│   ├── StatefulChats.js          # Chat state management (RAG, Data Sources, Quant Agent)
 │   ├── Navbar.js                 # Navigation component
 │   └── ...
 ├── hooks/
