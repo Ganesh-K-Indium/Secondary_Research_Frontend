@@ -253,7 +253,7 @@ export default function MarkdownRenderer({ content }) {
           return (
             <code
               key={idx}
-              className="bg-gray-200 dark:bg-gray-700/50 px-2 py-1 rounded text-teal-600 dark:text-teal-300 text-sm font-mono transition-colors"
+              className="bg-gray-200 dark:bg-gray-700/50 px-2 py-1 rounded text-indigo-700 dark:text-indigo-300 text-sm font-mono transition-colors"
             >
               {part.content}
             </code>
@@ -265,7 +265,7 @@ export default function MarkdownRenderer({ content }) {
               href={part.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-teal-400 hover:text-teal-300 underline transition-colors"
+              className="text-indigo-600 hover:text-indigo-700 underline transition-colors"
             >
               {part.content}
             </a>
@@ -327,7 +327,7 @@ export default function MarkdownRenderer({ content }) {
                     key={itemIdx}
                     className="flex items-start space-x-3 text-gray-800 dark:text-gray-100 transition-colors duration-500"
                   >
-                    <span className="text-teal-600 dark:text-teal-400 font-bold flex-shrink-0 mt-0.5 transition-colors duration-500">
+                    <span className="text-indigo-700 dark:text-indigo-400 font-bold flex-shrink-0 mt-0.5 transition-colors duration-500">
                       •
                     </span>
                     <span className="flex-1">{renderInline(item)}</span>
@@ -344,7 +344,7 @@ export default function MarkdownRenderer({ content }) {
                     key={itemIdx}
                     className="flex items-start space-x-3 text-gray-800 dark:text-gray-100 transition-colors duration-500"
                   >
-                    <span className="text-teal-600 dark:text-teal-400 font-semibold flex-shrink-0 min-w-fit transition-colors duration-500">
+                    <span className="text-indigo-700 dark:text-indigo-400 font-semibold flex-shrink-0 min-w-fit transition-colors duration-500">
                       {itemIdx + 1}.
                     </span>
                     <span className="flex-1">{renderInline(item)}</span>

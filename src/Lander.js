@@ -119,7 +119,7 @@ function Lander({ onStartChat }) {
               <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-4 mx-auto animate-float-slow shadow-2xl ${
                 isDark 
                   ? 'bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 shadow-indigo-500/20'
-                  : 'bg-gradient-to-r from-indigo-400 via-blue-400 to-purple-400 shadow-indigo-400/25'
+                  : 'bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 shadow-indigo-500/25'
               }`}>
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path
