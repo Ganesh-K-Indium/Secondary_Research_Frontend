@@ -38,7 +38,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 </div>
                 <div className="hidden md:block">
                   <h1 className="text-lg font-bold bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent">
-                    Secondary Research Agent
+                    Investment Analyst Agent
                   </h1>
                 </div>
               </div>
@@ -48,7 +48,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                   <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-800/30 rounded-lg border border-gray-700/30">
                     <div className="flex space-x-1">
                       {(currentSession.ragMessages && currentSession.ragMessages.length > 0) && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-teal-400" title="Has RAG messages" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-teal-400" title="Has Secondary Research messages" />
                       )}
                       {(currentSession.dataSourcesMessages && currentSession.dataSourcesMessages.length > 0) && (
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Has Data Sources messages" />
@@ -86,7 +86,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                 <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-gray-800/30 border border-gray-700/30">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-medium text-gray-300 tracking-wide">
-                    {currentChat === "rag" ? "Search" : currentChat === "dataSources" ? "Data Sources" : currentChat === "quantAgent" ? "Quant Agent" : "Ready"}
+                    {currentChat === "rag" ? "Secondary Research" : currentChat === "dataSources" ? "Data Sources" : currentChat === "quantAgent" ? "Quant Agent" : "Ready"}
                   </span>
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                     </svg>
                   </div>
                   <div className="hidden md:flex flex-col items-start">
-                    <span className="text-xs font-semibold tracking-wide">RAG</span>
+                    <span className="text-xs font-semibold tracking-wide">Secondary Research Agent</span>
                   </div>
                 </div>
                 {currentChat === "rag" && (

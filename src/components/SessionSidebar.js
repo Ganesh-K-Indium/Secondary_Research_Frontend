@@ -134,7 +134,7 @@ export default function SessionSidebar({
                           {formatDate(session.lastUpdated)}
                         </p>
                         <p className="text-xs text-gray-500 truncate mt-1">
-                          RAG: {(session.ragMessages || []).length} • DS: {(session.dataSourcesMessages || []).length} • QA: {(session.quantAgentMessages || []).length}
+                          SRA: {(session.ragMessages || []).length} • DS: {(session.dataSourcesMessages || []).length} • QA: {(session.quantAgentMessages || []).length}
                         </p>
                       </div>
                       
@@ -169,7 +169,7 @@ export default function SessionSidebar({
                     {/* Mode indicators */}
                     <div className="absolute top-2 right-2 flex space-x-1">
                       {(session.ragMessages && session.ragMessages.length > 0) && (
-                        <div className="w-2 h-2 rounded-full bg-teal-400" title="Has RAG messages" />
+                        <div className="w-2 h-2 rounded-full bg-teal-400" title="Has Secondary Research messages" />
                       )}
                       {(session.dataSourcesMessages && session.dataSourcesMessages.length > 0) && (
                         <div className="w-2 h-2 rounded-full bg-blue-400" title="Has Data Sources messages" />

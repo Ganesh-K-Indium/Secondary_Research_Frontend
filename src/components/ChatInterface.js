@@ -78,11 +78,11 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
 
   // Loading messages that rotate during processing
   const loadingMessages = mode === 'rag' ? [
-    "Searching knowledge base",
+    "Conducting secondary research",
     "Analyzing your question",
     "Finding relevant information",
-    "Processing documents",
-    "Preparing detailed response",
+    "Processing research data",
+    "Preparing detailed analysis",
     "Almost ready"
   ] : mode === 'dataSources' ? [
     "Processing your request",
@@ -319,10 +319,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             </div>
             <div>
               <h2 className="text-lg font-semibold text-white">
-                {mode === 'rag' ? 'Knowledge Assistant' : mode === 'dataSources' ? 'Source Convergence Point' : 'Quant Agent'}
+                {mode === 'rag' ? 'Secondary Research Agent' : mode === 'dataSources' ? 'Source Convergence Point' : 'Quant Agent'}
               </h2>
               <p className="text-xs text-gray-400">
-                {mode === 'rag' ? 'Search & Discover Information' : mode === 'dataSources' ? 'Where All Data Sources Converge' : 'Stock & Investment Analysis'}
+                {mode === 'rag' ? 'Advanced Secondary Research & Analysis' : mode === 'dataSources' ? 'Where All Data Sources Converge' : 'Stock & Investment Analysis'}
               </p>
             </div>
           </div>
@@ -393,11 +393,11 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                 )}
               </div>
               <h3 className="text-2xl font-semibold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent mb-4">
-                {mode === 'rag' ? 'Knowledge Base Search' : mode === 'dataSources' ? 'Data Source Operations' : 'Investment AI Analyst'}
+                {mode === 'rag' ? 'Secondary Research Agent' : mode === 'dataSources' ? 'Data Source Operations' : 'Investment AI Analyst'}
               </h3>
               <p className="text-gray-300 mb-6 text-lg">
                 {mode === 'rag' 
-                  ? 'Access information from the knowledge base by asking questions. Get accurate answers with relevant citations.'
+                  ? 'Advanced secondary research and analysis powered by AI. Ask questions to access comprehensive information with relevant citations and insights.'
                   : mode === 'dataSources'
                   ? 'Manage and coordinate operations across multiple data sources. Interact with Jira, Confluence, SharePoint, Google Drive, and more through our intelligent multi-agent system.'
                   : 'Get AI-powered stock analysis and investment insights. Ask about stock performance, market trends, financial metrics, and investment recommendations.'}
@@ -647,7 +647,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-              placeholder={`Type your message${mode === 'rag' ? ' to search knowledge base' : mode === 'dataSources' ? ' to contribute knowledge' : ' to analyze stocks'}...`}
+              placeholder={`Type your message${mode === 'rag' ? ' for secondary research' : mode === 'dataSources' ? ' to contribute knowledge' : ' to analyze stocks'}...`}
               disabled={loading}
             />
           </div>
