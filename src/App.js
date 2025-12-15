@@ -100,9 +100,9 @@ function AppContent() {
   }
 
   return (
-    <div className="h-screen flex bg-white dark:bg-black transition-colors duration-500">
+    <div className="h-screen flex bg-white dark:bg-black">
       {/* Main container with sidebar and chat - fixed widths to prevent shifting */}
-      <div className="flex-1 flex bg-white dark:bg-black border border-gray-200 dark:border-gray-800/60 rounded-2xl shadow-lg dark:shadow-2xl overflow-hidden transition-colors duration-500">
+      <div className="flex-1 flex bg-white dark:bg-black border border-gray-200 dark:border-gray-800/60 rounded-2xl shadow-lg dark:shadow-2xl overflow-hidden">
         
         {/* Session Sidebar */}
         <SessionSidebar

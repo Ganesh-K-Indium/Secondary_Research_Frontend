@@ -281,17 +281,17 @@ export default function MarkdownRenderer({ content }) {
   const blocks = parseContent(content);
 
   return (
-    <div className="space-y-3 leading-relaxed text-gray-800 dark:text-gray-100 transition-colors duration-500">
+    <div className="space-y-3 leading-relaxed text-gray-800 dark:text-gray-100">
       {blocks.map((block, idx) => {
         switch (block.type) {
           case 'heading':
             const headingClasses = {
-              1: 'text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-2 transition-colors duration-500',
-              2: 'text-xl font-bold text-gray-800 dark:text-gray-100 mt-3 mb-2 transition-colors duration-500',
-              3: 'text-lg font-semibold text-gray-800 dark:text-gray-100 mt-2 mb-1 transition-colors duration-500',
-              4: 'text-base font-semibold text-gray-800 dark:text-gray-100 mt-2 mb-1 transition-colors duration-500',
-              5: 'text-sm font-semibold text-gray-800 dark:text-gray-100 mt-1 mb-1 transition-colors duration-500',
-              6: 'text-xs font-semibold text-gray-700 dark:text-gray-200 mt-1 mb-1 transition-colors duration-500'
+              1: 'text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-2',
+              2: 'text-xl font-bold text-gray-800 dark:text-gray-100 mt-3 mb-2',
+              3: 'text-lg font-semibold text-gray-800 dark:text-gray-100 mt-2 mb-1',
+              4: 'text-base font-semibold text-gray-800 dark:text-gray-100 mt-2 mb-1',
+              5: 'text-sm font-semibold text-gray-800 dark:text-gray-100 mt-1 mb-1',
+              6: 'text-xs font-semibold text-gray-700 dark:text-gray-200 mt-1 mb-1'
             };
             const Tag = `h${block.level}`;
             return (
@@ -304,16 +304,16 @@ export default function MarkdownRenderer({ content }) {
             return (
               <div
                 key={idx}
-                className="border rounded-lg overflow-x-auto my-3 shadow-lg transition-colors duration-500 bg-gray-900 border-gray-800/50 dark:bg-gray-900 dark:border-gray-800/50"
+                className="border rounded-lg overflow-x-auto my-3 shadow-lg bg-gray-900 border-gray-800/50 dark:bg-gray-900 dark:border-gray-800/50"
               >
                 {block.language !== 'plaintext' && (
-                  <div className="px-4 py-2 bg-gray-900/80 border-b border-gray-800/50 flex items-center justify-between transition-colors duration-500">
-                    <span className="text-xs text-gray-400 font-mono uppercase tracking-wider transition-colors duration-500">
+                  <div className="px-4 py-2 bg-gray-900/80 border-b border-gray-800/50 flex items-center justify-between">
+                    <span className="text-xs text-gray-400 font-mono uppercase tracking-wider">
                       {block.language}
                     </span>
                   </div>
                 )}
-                <pre className="p-4 text-sm text-gray-100 font-mono overflow-x-auto transition-colors duration-500">
+                <pre className="p-4 text-sm text-gray-100 font-mono overflow-x-auto">
                   <code>{block.content}</code>
                 </pre>
               </div>
@@ -325,9 +325,9 @@ export default function MarkdownRenderer({ content }) {
                 {block.items.map((item, itemIdx) => (
                   <li
                     key={itemIdx}
-                    className="flex items-start space-x-3 text-gray-800 dark:text-gray-100 transition-colors duration-500"
+                    className="flex items-start space-x-3 text-gray-800 dark:text-gray-100"
                   >
-                    <span className="text-indigo-700 dark:text-indigo-400 font-bold flex-shrink-0 mt-0.5 transition-colors duration-500">
+                    <span className="text-indigo-700 dark:text-indigo-400 font-bold flex-shrink-0 mt-0.5">
                       •
                     </span>
                     <span className="flex-1">{renderInline(item)}</span>
@@ -342,9 +342,9 @@ export default function MarkdownRenderer({ content }) {
                 {block.items.map((item, itemIdx) => (
                   <li
                     key={itemIdx}
-                    className="flex items-start space-x-3 text-gray-800 dark:text-gray-100 transition-colors duration-500"
+                    className="flex items-start space-x-3 text-gray-800 dark:text-gray-100"
                   >
-                    <span className="text-indigo-700 dark:text-indigo-400 font-semibold flex-shrink-0 min-w-fit transition-colors duration-500">
+                    <span className="text-indigo-700 dark:text-indigo-400 font-semibold flex-shrink-0 min-w-fit">
                       {itemIdx + 1}.
                     </span>
                     <span className="flex-1">{renderInline(item)}</span>
@@ -355,7 +355,7 @@ export default function MarkdownRenderer({ content }) {
 
           case 'paragraph':
             return (
-              <p key={idx} className="text-gray-800 dark:text-gray-100 leading-relaxed transition-colors duration-500">
+              <p key={idx} className="text-gray-800 dark:text-gray-100 leading-relaxed">
                 {renderInline(block.content)}
               </p>
             );
@@ -364,15 +364,15 @@ export default function MarkdownRenderer({ content }) {
             return (
               <div
                 key={idx}
-                className="overflow-x-auto my-3 rounded-lg border border-gray-300 dark:border-gray-700 shadow-md transition-colors duration-500"
+                className="overflow-x-auto my-3 rounded-lg border border-gray-300 dark:border-gray-700 shadow-md"
               >
-                <table className="w-full border-collapse bg-white dark:bg-gray-800 transition-colors duration-500">
+                <table className="w-full border-collapse bg-white dark:bg-gray-800">
                   <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-700 transition-colors duration-500">
+                    <tr className="bg-gray-100 dark:bg-gray-700">
                       {block.headers.map((header, hIdx) => (
                         <th
                           key={hIdx}
-                          className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-gray-900 dark:text-white font-semibold transition-colors duration-500"
+                          className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-gray-900 dark:text-white font-semibold"
                         >
                           {renderInline(header)}
                         </th>
@@ -387,12 +387,12 @@ export default function MarkdownRenderer({ content }) {
                           rIdx % 2 === 0
                             ? 'bg-white dark:bg-gray-800'
                             : 'bg-gray-50 dark:bg-gray-700/30'
-                        } hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-500`}
+                        } hover:bg-gray-100 dark:hover:bg-gray-700`}
                       >
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-800 dark:text-gray-100 transition-colors duration-500"
+                            className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-800 dark:text-gray-100"
                           >
                             {renderInline(cell)}
                           </td>

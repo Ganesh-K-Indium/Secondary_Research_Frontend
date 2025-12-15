@@ -4,7 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 export default function Navbar({ currentChat, setCurrentChat, currentSession, onNewSession }) {
   const { isDark, toggleTheme } = useTheme();
   return (
-    <nav className={`bg-white dark:bg-slate-950 border-b transition-colors duration-500 relative ${isDark ? 'border-slate-800/40' : 'border-gray-200/50'}`}>
+    <nav className={`bg-white dark:bg-slate-950 border-b relative ${isDark ? 'border-slate-800/40' : 'border-gray-200/50'}`}>
       
       <div className="mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -38,7 +38,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                   </svg>
                 </div>
                 <div className="hidden md:block">
-                  <h1 className={`text-lg font-bold transition-colors duration-500 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     Investment Analyst Agent
                   </h1>
                 </div>
@@ -46,7 +46,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
               <div className="hidden lg:flex items-center space-x-3">
                 {/* Session info */}
                 {currentSession && (
-                  <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border transition-colors duration-500 ${
+                  <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border ${
                     isDark 
                       ? 'bg-slate-900/50 border-slate-800/50' 
                       : 'bg-gray-100 border-gray-200'
@@ -67,7 +67,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                         <div className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-400'}`} title="Empty session" />
                       )}
                     </div>
-                    <span className={`text-xs truncate max-w-32 transition-colors duration-500 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
+                    <span className={`text-xs truncate max-w-32 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
                       {currentSession.name}
                     </span>
                   </div>
@@ -88,14 +88,14 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
                   <span className="hidden xl:inline">New</span>
                 </button>
                 
-                <div className={`h-6 w-px transition-colors duration-500 ${isDark ? 'bg-slate-800/50' : 'bg-gray-300/50'}`}></div>
-                <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-lg border transition-colors duration-500 ${
+                <div className={`h-6 w-px ${isDark ? 'bg-slate-800/50' : 'bg-gray-300/50'}`}></div>
+                <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-lg border ${
                   isDark
                     ? 'bg-slate-900/50 border-slate-800/50'
                     : 'bg-gray-100 border-gray-200'
                 }`}>
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className={`text-xs font-medium tracking-wide transition-colors duration-500 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
+                  <span className={`text-xs font-medium tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
                     {currentChat === "rag" ? "Secondary Research" : currentChat === "dataSources" ? "Data Sources" : currentChat === "quantAgent" ? "Quant Agent" : "Ready"}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function Navbar({ currentChat, setCurrentChat, currentSession, on
 
           {/* Right section: Compact mode toggle buttons */}
           <div className="flex items-center space-x-3">
-            <div className={`flex items-center rounded-xl p-0.5 border transition-colors duration-500 ${
+            <div className={`flex items-center rounded-xl p-0.5 border ${
               isDark
                 ? 'bg-slate-900/50 border-slate-800/50'
                 : 'bg-gray-100 border-gray-200'

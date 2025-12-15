@@ -257,7 +257,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
   };
 
   return (
-    <div className={`flex flex-col h-full transition-colors duration-500 ${isDark ? 'bg-black text-gray-100' : 'bg-white text-gray-900'}`}>
+    <div className={`flex flex-col h-full ${isDark ? 'bg-black text-gray-100' : 'bg-white text-gray-900'}`}>
       <style>
         {`
           @keyframes opacity-fade {
@@ -267,7 +267,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
         `}
       </style>
       {/* Enhanced Chatbot Header */}
-      <div className={`border-b px-6 py-4 transition-colors duration-500 ${isDark ? 'bg-slate-950 border-slate-800/40' : 'bg-white border-gray-200/50'}`}>
+      <div className={`border-b px-6 py-4 ${isDark ? 'bg-slate-950 border-slate-800/40' : 'bg-white border-gray-200/50'}`}>
         <div className="flex items-center justify-between">
           {/* Left side - Bot info */}
           <div className="flex items-center space-x-3">
@@ -293,10 +293,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></div>
             </div>
             <div>
-              <h2 className={`text-lg font-semibold transition-colors duration-500 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {mode === 'rag' ? 'Secondary Research Agent' : mode === 'dataSources' ? 'Source Convergence Point' : 'Quant Agent'}
               </h2>
-              <p className={`text-xs transition-colors duration-500 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                 {mode === 'rag' ? 'Advanced Secondary Research & Analysis' : mode === 'dataSources' ? 'Where All Data Sources Converge' : 'Stock & Investment Analysis'}
               </p>
             </div>
@@ -336,7 +336,7 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
                 </button>
               </>
             )}
-            <div className={`flex items-center space-x-1 text-xs transition-colors duration-500 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+            <div className={`flex items-center space-x-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span>Online</span>
             </div>
@@ -345,10 +345,10 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
       </div>
 
       {/* Chat messages container with gradient background */}
-      <div ref={messagesContainerRef} className={`flex-1 overflow-y-auto p-4 space-y-4 transition-colors duration-500 ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
+      <div ref={messagesContainerRef} className={`flex-1 overflow-y-auto p-4 space-y-4 ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
         {safeMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
-            <div className={`p-8 rounded-2xl shadow-lg border max-w-2xl w-full backdrop-blur-sm transition-colors duration-500 ${
+            <div className={`p-8 rounded-2xl shadow-lg border max-w-2xl w-full backdrop-blur-sm ${
               isDark
                 ? 'bg-slate-950/50 border-slate-800/40'
                 : 'bg-white border-gray-200/30'
@@ -374,14 +374,14 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
               <h3 className="text-2xl font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent mb-4">
                 {mode === 'rag' ? 'Secondary Research Agent' : mode === 'dataSources' ? 'Data Source Operations' : 'Investment AI Analyst'}
               </h3>
-              <p className={`mb-6 text-lg transition-colors duration-500 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
+              <p className={`mb-6 text-lg ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
                 {mode === 'rag' 
                   ? 'Advanced secondary research and analysis powered by AI. Ask questions to access comprehensive information with relevant citations and insights.'
                   : mode === 'dataSources'
                   ? 'Manage and coordinate operations across multiple data sources. Interact with Jira, Confluence, SharePoint, Google Drive, and more through our intelligent multi-agent system.'
                   : 'Get AI-powered stock analysis and investment insights. Ask about stock performance, market trends, financial metrics, and investment recommendations.'}
               </p>
-              <div className={`text-sm flex items-center justify-center space-x-2 transition-colors duration-500 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+              <div className={`text-sm flex items-center justify-center space-x-2 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                         d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -398,19 +398,19 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
             >
               {msg.sender === "user" ? (
                 // User message
-                <div className={`px-4 py-3 rounded-2xl text-white shadow-lg shadow-indigo-500/30 max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl break-words transition-colors duration-500 bg-gradient-to-r from-indigo-600 to-indigo-500`}>
+                <div className={`px-4 py-3 rounded-2xl text-white shadow-lg shadow-indigo-500/30 max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl break-words bg-gradient-to-r from-indigo-600 to-indigo-500`}>
                   <p className="text-sm font-medium text-indigo-100 mb-1">You</p>
                   <p className="text-base">{msg.text}</p>
                 </div>
               ) : (
                 // Bot message with streaming typed response
-                <div className={`px-4 py-3 rounded-2xl text-sm shadow-lg border max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl transition-colors duration-500 ${
+                <div className={`px-4 py-3 rounded-2xl text-sm shadow-lg border max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl ${
                   isDark
                     ? 'bg-slate-900/60 border-slate-800/50 text-gray-100'
                     : 'bg-white border-gray-200/50 text-gray-900'
                 }`}>
-                  <p className={`text-xs font-medium mb-3 transition-colors duration-500 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>AI Assistant</p>
-                  <div className={`text-base transition-colors duration-500 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>
+                  <p className={`text-xs font-medium mb-3 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>AI Assistant</p>
+                  <div className={`text-base ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>
                     <TypedResponse content={msg.text} isComplete={true} />
                   </div>
                 </div>
@@ -423,16 +423,16 @@ export default function ChatInterface({ serverUrl, mode, messages, setMessages, 
       </div>
 
       {/* Input box fixed at bottom */}
-      <div className={`p-4 border-t transition-colors duration-500 ${isDark ? 'bg-black border-slate-800/40' : 'bg-gray-50 border-gray-200/50'}`}>
+      <div className={`p-4 border-t ${isDark ? 'bg-black border-slate-800/40' : 'bg-gray-50 border-gray-200/50'}`}>
         <div className="max-w-4xl mx-auto flex items-end gap-3">
-          <div className={`flex-1 rounded-xl border transition-colors duration-500 ${
+          <div className={`flex-1 rounded-xl border ${
             isDark
               ? 'bg-slate-900/50 border-slate-800/40'
               : 'bg-white border-gray-200/50'
           }`}>
             <input
               type="text"
-              className={`w-full px-4 py-3 rounded-xl bg-transparent focus:outline-none focus:ring-2 transition-colors duration-500 ${
+              className={`w-full px-4 py-3 rounded-xl bg-transparent focus:outline-none focus:ring-2 transition-colors duration-200 ${
                 isDark
                   ? 'text-gray-100 placeholder-gray-400 focus:ring-indigo-500/50'
                   : 'text-gray-900 placeholder-gray-500 focus:ring-indigo-400/50'

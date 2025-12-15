@@ -28,7 +28,7 @@ function Lander({ onStartChat }) {
         }
       `}</style>
 
-    <div className={`min-h-screen relative overflow-hidden transition-colors duration-500 ${
+    <div className={`min-h-screen relative overflow-hidden ${
       isDark 
         ? 'bg-black' 
         : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
@@ -132,7 +132,7 @@ function Lander({ onStartChat }) {
               </div>
             </div>
 
-            <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight transition-colors duration-500 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
               <span className={`bg-clip-text text-transparent animate-gradient-x ${
                 isDark
                   ? 'bg-gradient-to-r from-indigo-400 via-blue-400 to-purple-400'
@@ -142,9 +142,9 @@ function Lander({ onStartChat }) {
               </span>
             </h1>
 
-            <p className={`text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed transition-colors duration-500 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <p className={`text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Experience intelligent conversations powered by advanced AI. Choose between enhanced responses from our <span className={`font-semibold transition-colors duration-500 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`}>Secondary Research Agent</span>,
-              managing multiple data sources, or comprehensive stock analysis with our <span className={`font-semibold transition-colors duration-500 ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>Quant Agent</span>.
+              managing multiple data sources, or comprehensive stock analysis with our <span className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>Quant Agent</span>.
             </p>
           </div>
           
@@ -305,7 +305,7 @@ function Lander({ onStartChat }) {
 
           {/* Footer */}
           <div className="text-center mt-16 lg:mt-20">
-            <p className={`text-sm transition-colors duration-500 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+            <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
               Built with advanced AI technology and secure data handling
             </p>
           </div>
