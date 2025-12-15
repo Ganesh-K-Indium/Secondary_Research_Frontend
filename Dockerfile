@@ -1,0 +1,40 @@
+# Build stage
+FROM node:18-alpine AS build
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Set environment variables for build
+ARG REACT_APP_RAG_URL
+ARG REACT_APP_INGESTION_SERVER_URL
+ARG REACT_APP_QUANT_AGENT_URL
+ENV REACT_APP_RAG_URL=$REACT_APP_RAG_URL
+ENV REACT_APP_INGESTION_SERVER_URL=$REACT_APP_INGESTION_SERVER_URL
+ENV REACT_APP_QUANT_AGENT_URL=$REACT_APP_QUANT_AGENT_URL
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built app from build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy nginx configuration if needed (optional)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

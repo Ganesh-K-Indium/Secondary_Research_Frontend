@@ -3,10 +3,11 @@ import Navbar from "./components/Navbar";
 import SessionSidebar from "./components/SessionSidebar";
 import { RagChat, DataSourcesChat, QuantAgentChat } from "./components/StatefulChats";
 import { useSessionManager } from "./hooks/useSessionManager";
+import { ThemeProvider } from "./context/ThemeContext";
 import { migrateOldMessagesToSessions, shouldMigrate } from "./utils/migration";
 import Lander from "./Lander";
 
-function App() {
+function AppContent() {
   const [currentChat, setCurrentChat] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
@@ -99,9 +100,9 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
-      {/* Main container with sidebar and chat */}
-      <div className="flex-1 flex bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/30 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="h-screen flex bg-white dark:bg-black transition-colors duration-500">
+      {/* Main container with sidebar and chat - fixed widths to prevent shifting */}
+      <div className="flex-1 flex bg-white dark:bg-black border border-gray-200 dark:border-gray-800/60 rounded-2xl shadow-lg dark:shadow-2xl overflow-hidden transition-colors duration-500">
         
         {/* Session Sidebar */}
         <SessionSidebar
@@ -174,6 +175,14 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
