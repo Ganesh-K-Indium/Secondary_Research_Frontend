@@ -1,4 +1,5 @@
 import React from 'react';
+import ImageCard from './ImageCard';
 
 /**
  * Modern MarkdownRenderer component
@@ -8,6 +9,7 @@ import React from 'react';
  * - Lists (ordered and unordered)
  * - Links with proper styling
  * - Headers
+ * - Embedded images from URLs (Cloudinary, direct links, etc.)
  * - Removes unwanted symbols like ## at start of lines
  * - Terminal-like code block styling
  */
@@ -22,6 +24,98 @@ export default function MarkdownRenderer({ content }) {
         return cleanedLine;
       })
       .join('\n');
+  };
+
+  // Detect if a URL is an image
+  const isImageUrl = (url) => {
+    if (!url) return false;
+    // Check for common image extensions
+    const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i;
+    if (imageExtensions.test(url)) return true;
+    
+    // Check for known image service domains
+    if (url.includes('cloudinary.com') || 
+        url.includes('imgur.com') || 
+        url.includes('imgbb.com') ||
+        url.includes('cdn.') ||
+        url.includes('images.') ||
+        url.includes('img.')) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Extract image URL from markdown image syntax or detect bare URLs
+  const extractImageInfo = (text) => {
+    // Match markdown image syntax: ![alt](url)
+    const markdownImageRegex = /!\[([^\]]*)\]\(([^)]+)\)/;
+    const markdownMatch = text.match(markdownImageRegex);
+    
+    if (markdownMatch) {
+      return {
+        url: markdownMatch[2],
+        alt: markdownMatch[1] || 'Image',
+        isMarkdownImage: true,
+        fullMatch: markdownMatch[0]
+      };
+    }
+
+    // Match bare image URLs
+    const urlRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|png|gif|webp|svg|bmp))/i;
+    const urlMatch = text.match(urlRegex);
+    
+    if (urlMatch && isImageUrl(urlMatch[1])) {
+      return {
+        url: urlMatch[1],
+        alt: 'Image',
+        isMarkdownImage: false,
+        fullMatch: urlMatch[1]
+      };
+    }
+
+    // Match URLs from known image services even without extension
+    const serviceUrlRegex = /(https?:\/\/(?:res\.cloudinary\.com|cdn\.|images\.|img\.)[^\s]*)/;
+    const serviceMatch = text.match(serviceUrlRegex);
+    
+    if (serviceMatch && isImageUrl(serviceMatch[1])) {
+      return {
+        url: serviceMatch[1],
+        alt: 'Image',
+        isMarkdownImage: false,
+        fullMatch: serviceMatch[1]
+      };
+    }
+
+    return null;
+  };
+
+  // Pre-process content to extract images
+  const preprocessImages = (text) => {
+    const images = [];
+    let processedText = text;
+    let offset = 0;
+
+    // Find all image URLs (both markdown and bare URLs)
+    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)|https?:\/\/(?:res\.cloudinary\.com|cdn\.|images\.|img\.)[^\s]*/gi;
+    let match;
+    
+    while ((match = imageRegex.exec(text)) !== null) {
+      const url = match[2] || match[0]; // Get URL from markdown syntax or full URL
+      const alt = match[1] || 'Image';
+      
+      if (isImageUrl(url)) {
+        images.push({
+          url,
+          alt,
+          index: images.length,
+          position: match.index - offset
+        });
+        offset += match[0].length;
+      }
+    }
+
+    return { images, text: processedText };
   };
 
   // Parse content into blocks
@@ -142,10 +236,42 @@ export default function MarkdownRenderer({ content }) {
           paragraphLines.push(lines[i]);
           i++;
         }
-        blocks.push({
-          type: 'paragraph',
-          content: paragraphLines.join('\n')
-        });
+        
+        const paragraphText = paragraphLines.join('\n');
+        const imageInfo = extractImageInfo(paragraphText);
+        
+        if (imageInfo) {
+          // Add the image block
+          blocks.push({
+            type: 'image',
+            url: imageInfo.url,
+            alt: imageInfo.alt
+          });
+          
+          // Add any remaining text (before or after image)
+          if (imageInfo.isMarkdownImage) {
+            const beforeImage = paragraphText.substring(0, paragraphText.indexOf(imageInfo.fullMatch));
+            const afterImage = paragraphText.substring(paragraphText.indexOf(imageInfo.fullMatch) + imageInfo.fullMatch.length);
+            
+            if (beforeImage.trim()) {
+              blocks.push({
+                type: 'paragraph',
+                content: beforeImage.trim()
+              });
+            }
+            if (afterImage.trim()) {
+              blocks.push({
+                type: 'paragraph',
+                content: afterImage.trim()
+              });
+            }
+          }
+        } else {
+          blocks.push({
+            type: 'paragraph',
+            content: paragraphText
+          });
+        }
         continue;
       }
 
@@ -358,6 +484,16 @@ export default function MarkdownRenderer({ content }) {
               <p key={idx} className="text-gray-800 dark:text-gray-100 leading-relaxed">
                 {renderInline(block.content)}
               </p>
+            );
+
+          case 'image':
+            return (
+              <ImageCard
+                key={idx}
+                src={block.url}
+                alt={block.alt}
+                caption={block.alt !== 'Image' ? block.alt : null}
+              />
             );
 
           case 'table':
